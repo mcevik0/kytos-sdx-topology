@@ -1,13 +1,13 @@
 """
-Main module of amlight/sdx Kytos Network Application.
+Main module of amlight/sdx_topology Kytos Network Application.
 
 SDX API
 """
 
 import requests
-import napps.amlight.sdx.storehouse
-from napps.amlight.sdx import settings
-from napps.amlight.sdx.topology_class import ParseTopology
+import napps.amlight.sdx_topology.storehouse
+from napps.amlight.sdx_topology import settings
+from napps.amlight.sdx_topology.topology_class import ParseTopology
 from flask import jsonify, request
 from kytos.core import rest
 from kytos.core import KytosNApp, log
@@ -23,7 +23,7 @@ from werkzeug.exceptions import (BadRequest, Conflict, Forbidden,
                                  UnsupportedMediaType)
 
 class Main(KytosNApp):
-    """Main class of amlight/sdx NApp.
+    """Main class of amlight/sdx_topology NApp.
 
     This class is the entry point for this NApp.
     """
@@ -90,7 +90,7 @@ class Main(KytosNApp):
         """Function meant for validation, to make sure that the storehouse napp has been loaded
         before all the other functions that use it begins to call it."""
         log.info("Loading Storehouse")
-        self.storehouse = napps.amlight.sdx.storehouse.StoreHouse(self.controller)
+        self.storehouse = napps.amlight.sdx_topology.storehouse.StoreHouse(self.controller)
 
     @listen_to('kytos/topology.*')
     def load_topology(self, event=None):  # pylint: disable=W0613
