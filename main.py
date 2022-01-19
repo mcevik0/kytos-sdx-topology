@@ -5,19 +5,14 @@ SDX API
 """
 
 import requests
-import napps.amlight.sdx_topology.storehouse
-from napps.amlight.sdx_topology import settings
-from napps.amlight.sdx_topology.topology_class import ParseTopology
+import napps.kytos.sdx_topology.storehouse
+from napps.kytos.sdx_topology import settings
+from napps.kytos.sdx_topology.topology_class import ParseTopology
 from flask import jsonify, request
 from kytos.core import rest
 from kytos.core import KytosNApp, log
 from kytos.core.helpers import listen_to
 from kytos.core.napps import NAppsManager
-from openapi_core import create_spec
-from openapi_core.contrib.flask import FlaskOpenAPIRequest
-from openapi_core.validation.request.validators import RequestValidator
-from openapi_spec_validator import validate_spec
-from openapi_spec_validator.readers import read_from_filename
 from werkzeug.exceptions import (BadRequest, Conflict, Forbidden,
                                  MethodNotAllowed, NotFound,
                                  UnsupportedMediaType)

@@ -87,6 +87,8 @@ Version
 
 # Test
 
+// Install python dependecies requirements
+
 # Asynchronous Lint Engine
 
 // ALE (Asynchronous Lint Engine) is a plugin providing linting (syntax checking and semantic errors)
@@ -95,11 +97,16 @@ Version
 
 cd ~/.vim/bundle
 
+Set up Vundle:
+
+git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+
 git clone https://github.com/dense-analysis/ale.git
 
 // Edit ~/.vimrc
 
 set rtp+=~/.vim/bundle/Vundle.vim
+
 let path='~/.vim/bundle/Vundle.vim'
 
 call vundle#begin()
@@ -109,6 +116,7 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'dense-analysis/ale'
 
 call vundle#end()            " required
+
 filetype plugin indent on    " required
 
 let g:ale_linters = {
@@ -118,7 +126,15 @@ let g:ale_linters = {
 
 // Then run the command :PlugInstall in Vim.
 
+:source ~/.vimrc
+:PluginInstall
 
 # Black
 
 black --check --diff main.py
+
+black main.py
+
+# Isort
+
+isort main.py
