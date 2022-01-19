@@ -2,22 +2,22 @@
     End to End Tests Support Functions
 
     Class designed to contain all the functions needed to run
-    all E2E tests pertaining to the Amlight-SDx napp
+    all E2E tests pertaining to the kytos/sdx_topology napp
 """
 
 import sys
 import requests
-from napps.amlight.sdx.settings import kytos_topology_url, new_headers
+from napps.kytos.sdx_topology.settings import kytos_topology_url, new_headers
 
 
-def submit_get_req_to_amlight_sdx_topology_api(schema_url):
-    """ Connects to Amlight-SDX topology API, looks for 200 status code,
+def submit_get_req_to_kytos_sdx_topology_api(schema_url):
+    """ Connects to kytos/sdx_topology topology API, looks for 200 status code,
      and returns sdx topology in json format"""
 
     try:
         response = requests.get(schema_url + "topology", headers=new_headers)
     except Exception as err:
-        print("Error connecting to Amlight-SDX API")
+        print("Error connecting to kytos/sdx_topology API")
         print(err)
         sys.exit(1)
 
@@ -35,7 +35,7 @@ def submit_get_req_to_retrieve_oxp_endpoint(endpoint_name, schema_url):
     try:
         endpoint = requests.get(schema_url + endpoint_name, headers=new_headers).json()
     except Exception as err:
-        print("Error connecting to Amlight-SDX API")
+        print("Error connecting to kytos/sdx_topology API")
         print(err)
         sys.exit(1)
 

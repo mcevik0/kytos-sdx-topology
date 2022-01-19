@@ -1,1 +1,1 @@
-"""Module for the NApp amlight/sdx."""
+"""Module for the NApp kytos/sdx_topology."""

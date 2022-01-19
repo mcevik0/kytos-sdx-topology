@@ -2,19 +2,19 @@
     End to End Tests
 
     Class designed to contain all the E2E tests pertaining to the
-    Amlight-SDx napp to verify all its functionalities
+    kytos/sdx_topology napp to verify all its functionalities
 """
 
 
 import itertools
-from napps.amlight.sdx.settings import amlight_schema_url, sax_schema_url,\
+from napps.kytos.sdx_topology.settings import amlight_schema_url, sax_schema_url,\
      tenet_schema_url, kytos_topology_url
-from napps.amlight.sdx.tests.e2e_support_functions import submit_get_req_to_amlight_sdx_topology_api
-from napps.amlight.sdx.tests.e2e_support_functions import submit_get_req_to_retrieve_oxp_endpoint
-from napps.amlight.sdx.tests.e2e_support_functions import submit_get_req_to_retrieve_kytos_topology
-from napps.amlight.sdx.tests.e2e_support_functions import submit_post_req_to_enable_kytos_link
-from napps.amlight.sdx.tests.e2e_support_functions import submit_post_req_to_disable_kytos_link
-from napps.amlight.sdx.tests.e2e_support_functions import validate_sdx_nodes_number_and_content
+from napps.kytos.sdx_topology.tests.e2e_support_functions import submit_get_req_to_amlight_sdx_topology_api
+from napps.kytos.sdx_topology.tests.e2e_support_functions import submit_get_req_to_retrieve_oxp_endpoint
+from napps.kytos.sdx_topology.tests.e2e_support_functions import submit_get_req_to_retrieve_kytos_topology
+from napps.kytos.sdx_topology.tests.e2e_support_functions import submit_post_req_to_enable_kytos_link
+from napps.kytos.sdx_topology.tests.e2e_support_functions import submit_post_req_to_disable_kytos_link
+from napps.kytos.sdx_topology.tests.e2e_support_functions import validate_sdx_nodes_number_and_content
 
 
 def end_to_end_test_1_1():
@@ -23,7 +23,7 @@ def end_to_end_test_1_1():
 
     # submit get request and validate 200 response to /v1/topology
 
-    submit_get_req_to_amlight_sdx_topology_api(schema_url=amlight_schema_url)
+    submit_get_req_to_kytos_sdx_topology_api(schema_url=amlight_schema_url)
 
 
 def end_to_end_test_1_2():

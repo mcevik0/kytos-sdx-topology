@@ -1,4 +1,4 @@
-"""Module with the Constants used in the amlight/sdx."""
+"""Module with the Constants used in the kytos/sdx_topology."""
 
 topology_url = "http://localhost:8181/api/kytos/topology/v3/"
 validate_topology="http://3.218.56.104:8000/v1/validate"
