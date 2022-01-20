@@ -1,0 +1,8 @@
+README.md
+setup.py
+kytos_sdx_topology.egg-info/PKG-INFO
+kytos_sdx_topology.egg-info/SOURCES.txt
+kytos_sdx_topology.egg-info/dependency_links.txt
+kytos_sdx_topology.egg-info/not-zip-safe
+kytos_sdx_topology.egg-info/requires.txt
+kytos_sdx_topology.egg-info/top_level.txt
