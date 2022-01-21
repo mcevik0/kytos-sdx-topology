@@ -7,95 +7,94 @@
 
 import sys
 import requests
-from napps.kytos.sdx_topology.settings import kytos_topology_url, new_headers
+from flask import jsonify
+from napps.kytos.sdx_topology import settings  \
+        # pylint: disable=E0401
 
 
-def submit_get_req_to_kytos_sdx_topology_api(schema_url):
+def kytos_sdx_topology_api(schema_url):
     """ Connects to kytos/sdx_topology topology API, looks for 200 status code,
      and returns sdx topology in json format"""
 
-    try:
-        response = requests.get(schema_url + "topology", headers=new_headers)
-    except Exception as err:
-        print("Error connecting to kytos/sdx_topology API")
-        print(err)
-        sys.exit(1)
-
+    response = requests.get(
+                schema_url + "topology", headers=settings.HEADERS)
     if response.status_code != 200:
-        raise Exception("Return code is not 201, response = %s" % response.content)
-
-    print("Success")
+        print("Error connecting to kytos/sdx_topology API")
+    else:
+        print("Success")
     return response.json()
 
 
-def submit_get_req_to_retrieve_oxp_endpoint(endpoint_name, schema_url):
+def retrieve_oxp_endpoint(endpoint_name, schema_url):
     """ Submits request to SDX API to retrieve and validate the oxp_name &
     oxp_url"""
 
-    try:
-        endpoint = requests.get(schema_url + endpoint_name, headers=new_headers).json()
-    except Exception as err:
+    response = requests.get(
+            schema_url + endpoint_name, headers=settings.HEADERS)
+    if response.status_code != 200:
         print("Error connecting to kytos/sdx_topology API")
-        print(err)
-        sys.exit(1)
+    else:
+        print("Success")
+    return response.json()
 
-    return endpoint
 
-
-def submit_get_req_to_retrieve_kytos_topology(api_url):
+def retrieve_kytos_topology(api_url):
     """ Submits a GET request to Kytos APi to retrieve the current Kytos
     topology"""
 
-    try:
-        topo = requests.get(api_url, headers=new_headers).json()
-    except Exception as err:
+    response = requests.get(api_url, headers=settings.HEADERS)
+    if response.status_code != 200:
         print("Error connecting to Kytos API to retrieve topology")
-        print(err)
-        sys.exit(1)
+    else:
+        print("Success")
+    return response.json()
 
-    return topo
 
-
-def submit_post_req_to_enable_kytos_link(link_id):
+def enable_kytos_link(link_id):
     """ Submits a POST request to Kytos API to enable a specific link"""
 
-    enable_api_url = kytos_topology_url + "/links/" + link_id + "/enable"
-    try:
-        response = requests.post(enable_api_url, headers=new_headers)
-    except Exception as err:
-        print("Error connecting to Kytos topology API to enable link")
-        print(err)
-        sys.exit(1)
-
+    enable_api_url = settings.KYTOS_TOPOLOGY_URL+"/links/"+link_id+"/enable"
+    response = requests.post(enable_api_url, headers=settings.HEADERS)
     if response.status_code != 201:
-        raise Exception("Return code is not 200, response = %s" % response.content)
+        print("Error connecting to Kytos API to retrieve topology")
+    else:
+        print("Success")
+    return response.json()
 
 
-def submit_post_req_to_disable_kytos_link(link_id):
+def disable_kytos_link(link_id):
     """ Submits a POST request to Kytos API to disable a specific link"""
 
-    disable_api_url = kytos_topology_url + "/links/" + link_id + "/disable"
-    try:
-        requests.post(disable_api_url, headers=new_headers)
-        content = requests.get(kytos_topology_url, headers=new_headers).json()
-    except Exception as err:
+    disable_api_url = settings.KYTOS_TOPOLOGY_URL+"/links/"+link_id+"/disable"
+    response = requests.post(disable_api_url, headers=settings.HEADERS)
+    if response.status_code != 201:
+        print("Error connecting to Kytos API to retrieve topology")
+    else:
+        print("Success")
+    content = requests.get(
+            settings.KYTOS_TOPOLOGY_URL, headers=settings.HEADERS)
+    if content.status_code != 200:
         print("Error connecting to Kytos topology API to disable link")
-        print(err)
-        sys.exit(1)
 
-    return content
+    return content.json()
 
 
 def validate_sdx_nodes_number_and_content(sdx_topo, expected_nodes):
     """ Receives the sdx_topology and number of expected nodes to be found
     in either the amlight, sax, or tenet topologies and validates that the
-    nodes list is NOT empty and contains the expected amount of nodes"""\
+    nodes list is NOT empty and contains the expected amount of nodes"""
 
-    if len(sdx_topo['nodes']) == 0: return Exception("List of nodes is EMPTY "
-                                                     "after Napp initialization")
+    message = {"error": ""}
+    status_code = 200
 
-    if isinstance(sdx_topo, dict):
-        if len(sdx_topo['nodes']) == expected_nodes:
-            print("Success")
+    if len(sdx_topo['nodes']) == 0:
+        message = {"error": "List of nodes is EMPTY after Napp initialization"}
+        status_code = 400
+    elif isinstance(sdx_topo, dict):
+        if len(sdx_topo['nodes']) != expected_nodes:
+            message = {"error": "Unexpected number of nodes"}
+            status_code = 400
     else:
-        raise Exception("The returned Amlight-SDX topology is not a dictionary")
+        message = {"error": "Amlight-SDX topology isn't a dictionary"}
+        status_code = 400
+    return jsonify(message), status_code

@@ -7,14 +7,9 @@
 
 
 import itertools
-from napps.kytos.sdx_topology.settings import amlight_schema_url, sax_schema_url,\
-     tenet_schema_url, kytos_topology_url
-from napps.kytos.sdx_topology.tests.e2e_support_functions import submit_get_req_to_amlight_sdx_topology_api
-from napps.kytos.sdx_topology.tests.e2e_support_functions import submit_get_req_to_retrieve_oxp_endpoint
-from napps.kytos.sdx_topology.tests.e2e_support_functions import submit_get_req_to_retrieve_kytos_topology
-from napps.kytos.sdx_topology.tests.e2e_support_functions import submit_post_req_to_enable_kytos_link
-from napps.kytos.sdx_topology.tests.e2e_support_functions import submit_post_req_to_disable_kytos_link
-from napps.kytos.sdx_topology.tests.e2e_support_functions import validate_sdx_nodes_number_and_content
+from napps.kytos.sdx_topology import settings  # pylint: disable=E0401
+from napps.kytos.sdx_topology.tests import e2e_support_functions as \
+        get_req_to  # pylint: disable=E0401
 
 
 def end_to_end_test_1_1():
@@ -23,14 +18,14 @@ def end_to_end_test_1_1():
 
     # submit get request and validate 200 response to /v1/topology
 
-    submit_get_req_to_kytos_sdx_topology_api(schema_url=amlight_schema_url)
+    get_req_to.kytos_sdx_topology_api(schema_url=settings.AMLIGHT_TOPOLOGY_URL)
 
 
 def end_to_end_test_1_2():
     """Tests that the oxp_url endpoint was properly populated"""
 
-    oxp_url = submit_get_req_to_retrieve_oxp_endpoint(endpoint_name="oxp_url",
-                                                      schema_url=amlight_schema_url)
+    oxp_url = get_req_to.retrieve_oxp_endpoint(
+            endpoint_name="oxp_url", schema_url=settings.AMLIGHT_TOPOLOGY_URL)
 
     if oxp_url == "amlight.net":
         print("Success")
@@ -39,8 +34,8 @@ def end_to_end_test_1_2():
 def end_to_end_test_1_3():
     """Tests that the oxp_name endpoint was properly populated"""
 
-    oxp_name = submit_get_req_to_retrieve_oxp_endpoint(endpoint_name="oxp_name",
-                                                       schema_url=amlight_schema_url)
+    oxp_name = get_req_to.retrieve_oxp_endpoint(
+            endpoint_name="oxp_name", schema_url=settings.AMLIGHT_TOPOLOGY_URL)
 
     if oxp_name == "AmLight":
         print("Success")
@@ -52,11 +47,13 @@ def end_to_end_test_1_4():
 
     # Retrieve "id" from sdx topology
 
-    req = submit_get_req_to_amlight_sdx_topology_api(schema_url=amlight_schema_url)
+    req = get_req_to.amlight_sdx_topology_api(
+            schema_url=settings.AMLIGHT_TOPOLOGY_UR)
 
-    # Validate using .split that the 4th field is populated with the proper topology name
+    # Validate using .split 4th field populated with the proper topology name
     topo_id = str(req["id"].split(":")[3])
-    if topo_id == "amlight.net": print("Success")
+    if topo_id == "amlight.net":
+        print("Success")
 
 
 def end_to_end_test_1_5():
@@ -65,32 +62,35 @@ def end_to_end_test_1_5():
     link_id = ""
 
     # Retrieve one link from kytos topology api
-    topo = submit_get_req_to_retrieve_kytos_topology(api_url=kytos_topology_url)
+    topo = get_req_to.retrieve_kytos_topology(
+            api_url=settings.KYTOS_TOPOLOGY_URL)
 
     if isinstance(topo, dict):
-        for link in itertools.islice(topo['topology']['links'], 0, 1):  # get only the first link
+        for link in itertools.islice(topo['topology']['links'], 0, 1):
+            # get only the first link
             link_id = link
     else:
         raise Exception("The returned Kytos topology is not a dictionary")
 
     # Enable Kytos Link
-    submit_post_req_to_enable_kytos_link(link_id=link_id)
+    get_req_to.enable_kytos_link(link_id=link_id)  # post method
 
     # Retrieve link list from sdx api and validate that LINK_Id is there
-    req = submit_get_req_to_amlight_sdx_topology_api(schema_url=amlight_schema_url)
+    req = get_req_to.amlight_sdx_topology_api(
+            schema_url=settings.AMLIGHT_TOPOLOGY_URL)
 
     if isinstance(req, dict):
         if len(req['links']) == 1:
             print("Successfully tested that a link was added to the "
                   "list of links in the sdx schema!")
     else:
-        raise Exception("The returned Amlight-SDX topology is not a dictionary")
+        raise Exception("returned Amlight-SDX topology is not a dictionary")
 
     # Disable link_id for future tests
-    content = submit_post_req_to_disable_kytos_link(link_id=link_id)
+    content = get_req_to.disable_kytos_link(link_id=link_id)  # POST method
 
     if content['topology']['links'][link_id]["enabled"] is False:
-        print("Successfully confirmed that the link_id was set to false again in Kytos topology")
+        print("Link_id was set to false in Kytos topology")
 
     print("Success")
 
@@ -100,53 +100,55 @@ def end_to_end_test_1_6():
      initialization for the AMLIGHT node & validate # of switches"""
 
     # if switches list is empty, return error
-    # else: retrieve the list of switches & validate against expected number based on topology
+    # else: retrieve the list of switches &
+    # validate against expected number based on topology
 
-    req = submit_get_req_to_amlight_sdx_topology_api(schema_url=amlight_schema_url)
+    req = get_req_to.amlight_sdx_topology_api(
+            schema_url=settings.AMLIGHT_TOPOLOGY)
 
-    validate_sdx_nodes_number_and_content(sdx_topo=req, expected_nodes=11)
+    get_req_to.validate_sdx_nodes_number_and_content(
+            sdx_topo=req, expected_nodes=11)
 
 
 def end_to_end_test_1_7():
     """Test that the list of dictionaries for nodes IS NOT empty upon napp
      initialization for the SAX node & validate # of switches"""
 
-    req = submit_get_req_to_amlight_sdx_topology_api(schema_url=sax_schema_url)
+    req = get_req_to.amlight_sdx_topology_api(
+            schema_url=settings.SAX_TOPOLOGY_URL)
 
-    validate_sdx_nodes_number_and_content(sdx_topo=req, expected_nodes=2)
+    get_req_to.validate_sdx_nodes_number_and_content(
+            sdx_topo=req, expected_nodes=2)
 
 
 def end_to_end_test_1_8():
     """Test that the list of dictionaries for nodes IS NOT empty upon napp
      initialization for the TENET node & validate # of switches"""
 
-    req = submit_get_req_to_amlight_sdx_topology_api(schema_url=tenet_schema_url)
+    req = get_req_to.amlight_sdx_topology_api(
+            schema_url=settings.TENET_TOPOLOGY_URL)
 
-    validate_sdx_nodes_number_and_content(sdx_topo=req, expected_nodes=3)
+    get_req_to.validate_sdx_nodes_number_and_content(
+            sdx_topo=req, expected_nodes=3)
 
 
 def end_to_end_test_1_9():
     """Test to confirm the node IDs are correct"""
-    pass
 
 
 def end_to_end_test_1_10():
     """Test to confirm ports IDs are correct"""
-    pass
 
 
 def end_to_end_test_1_11():
     """Test to confirm inter-domain nni ids are correct"""
-    pass
 
 
 def end_to_end_test_1_12():
     """ Tests that the timestamp is properly updated after a Kytos event
     was registered"""
-    pass
 
 
 def end_to_end_test_1_13():
     """Tests that the version is properly updated after an operational event
     was registered"""
-    pass

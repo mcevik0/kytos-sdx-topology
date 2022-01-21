@@ -110,7 +110,7 @@ class Main(KytosNApp):
     @staticmethod
     def get_kytos_topology():
         """retrieve topology from API"""
-        kytos_topology = requests.get(settings.topology_url).json()
+        kytos_topology = requests.get(settings.KYTOS_TOPOLOGY_URL).json()
         return kytos_topology["topology"]
 
     @rest("v1/oxp_url", methods=["GET"])
@@ -180,7 +180,7 @@ class Main(KytosNApp):
                 "links": topology_update["links"],
             }
             validate_topology = requests.post(
-                settings.validate_topology, json=topology_dict
+                settings.VALIDATE_TOPOLOGY, json=topology_dict
             )
             if validate_topology.status_code == 200:
                 return jsonify(topology_update), 200
