@@ -5,22 +5,20 @@ every time.
 """
 
 
-import sys
-import datetime
 import json
+from random import randrange
 import requests
-from random import randint
 
 
 def get_nodes_name(kytos_topology):
-    """Function to retrieve the data_path attribute for every switch form Kytos's topology API"""
+    """Retrieve switches data_path attribute from Kytos's topology API"""
     #
-new_headers = {'Content-type': 'application/json'}
-topology_url = "http://0.0.0.0:8181/api/kytos/topology/v3"
+    new_headers = {'Content-type': 'application/json'}
+    topology_url = "http://0.0.0.0:8181/api/kytos/topology/v3"
 
-response = requests.get(topology_url, headers=new_headers)
+    response = requests.get(topology_url, headers=new_headers)
 
-kytos_topology = json.loads(response.content.decode("utf-8"))["topology"]
+    kytos_topology = json.loads(response.content.decode("utf-8"))["topology"]
 
     nodes_mappings = {}
 
@@ -51,18 +49,45 @@ def get_port_urn(topology, switch, interface, oxp_url):
     return f"urn:sdx:port:{oxp_url}:{switch_name}:{interface}"
 
 
+def get_port_type(speed):
+    """Function to obtain the speed of a specific port in the network."""
+    speed_in = (
+            ("1GE", 125000000, 125000000.0),
+            ("10GE", 1250000000, 1250000000.0),
+            ("25GE", 3125000000, 3125000000.0),
+            ("40GE", 5000000000, 5000000000.0),
+            ("50GE", 6250000000, 6250000000.0),
+            ("100GE", 12500000000, 12500000000.0),
+            ("400GE", 50000000000, 50000000000.0))
+    speed_out = ("1GE", "10GE", "25GE", "40GE", "50GE", "100GE", "400GE")
+    result = [speed_out[x] for x in range(7) if speed in speed_in[x]][0]
+    if not result:
+        result = ["Other"]
+    return result[0]
+
+
 def get_port_speed(speed):
     """Function to obtain the speed of a specific port in the network."""
-    if speed == 100000000:
-        return "100GE"
-    elif speed == 1250000000:
-        return "10GE"
-    elif speed == 40000000:  # TODO ; speeds not provided in O.F. 1.3 specification
-        return "40GE"
-    elif speed == 125000000:
-        return "1GE"
-    else:
-        return "Unknown"
+    speed_in = (
+            ("1GE", 125000000, 125000000.0),
+            ("10GE", 1250000000, 1250000000.0),
+            ("25GE", 3125000000, 3125000000.0),
+            ("40GE", 5000000000, 5000000000.0),
+            ("50GE", 6250000000, 6250000000.0),
+            ("100GE", 12500000000, 12500000000.0),
+            ("400GE", 50000000000, 50000000000.0))
+    speed_out = (
+            125000000,
+            1250000000,
+            3125000000,
+            5000000000,
+            6250000000,
+            12500000000,
+            50000000000)
+    result = [speed_out[x] for x in range(7) if speed in speed_in[x]][0]
+    if not result:
+        result = ["9999999999"]
+    return result[0]
 
 
 def get_port(node, interface, oxp_url):
@@ -71,11 +96,11 @@ def get_port(node, interface, oxp_url):
     if interface == "" or node == "":
         raise ValueError("Interface and node CANNOT be empty")
 
-    port = dict()
+    port = {}
     port["id"] = get_port_urn(node, interface["port_number"], oxp_url)
     port["name"] = interface["name"]
     port["node"] = f"urn:sdx:node:{oxp_url}:{node}"
-    port["type"] = get_port_speed(interface["speed"])
+    port["type"] = get_port_type(interface["speed"])
     port["status"] = "up" if interface["active"] else "down"
     port["state"] = "enabled" if interface["enabled"] else "disabled"
     port["services"] = "l2vpn"
@@ -95,7 +120,7 @@ def get_port(node, interface, oxp_url):
 def get_ports(node, interfaces, oxp_url):
     """Function that calls the main individual get_port function,
     to get a full list of ports from a node/ interface """
-    ports = list()
+    ports = []
     for interface in interfaces.values():
         port_no = interface["port_number"]
         if port_no != 4294967294:
@@ -112,7 +137,7 @@ def get_node(topology, switch, oxp_url):
     if switch == "":
         raise ValueError("Switch CANNOT be empty")
 
-    node = dict()
+    node = {}
 
     if "node_name" in switch["metadata"]:
         node["name"] = switch["metadata"]["node_name"]
@@ -133,12 +158,12 @@ def get_node(topology, switch, oxp_url):
 
 
 def get_nodes(topology, oxp_url):
-    """function that returns a list of Nodes objects for every node in a topology"""
+    """Returns a list of Nodes objects for every node in a topology"""
 
     if topology["switches"] == "":
         raise ValueError("Switches CANNOT be empty")
 
-    nodes = list()
+    nodes = []
 
     for switch in topology["switches"].values():
         if switch["enabled"]:
@@ -155,7 +180,7 @@ def get_link(topology, kytos_link, oxp_url):
     if kytos_link == "":
         raise ValueError("Kytos_link CANNOT be empty")
 
-    link = dict()
+    link = {}
     interface_a = int(kytos_link["endpoint_a"]["id"].split(":")[8])
     switch_a = ":".join(kytos_link["endpoint_a"]["id"].split(":")[0:8])
     interface_b = int(kytos_link["endpoint_b"]["id"].split(":")[8])
@@ -163,15 +188,21 @@ def get_link(topology, kytos_link, oxp_url):
     if switch_a == switch_b:
         return link
 
-    link["name"] = "%s/%s_%s/%s" % (get_nodes_name(topology)[switch_a], interface_a,
-                                    get_nodes_name(topology)[switch_b], interface_b)
+    name = f'{get_nodes_name(topology)[switch_a]}{"/"}{interface_a}'
+    name += f'{"_"}{get_nodes_name(topology)[switch_b]}{"/"}{ interface_b}'
+    link["name"] = name
     link["id"] = f"urn:sdx:link:{oxp_url}:%s" % link["name"]
     link["ports"] = [get_port_urn(switch_a, interface_a, oxp_url),
                      get_port_urn(switch_b, interface_b, oxp_url)]
 
     link["type"] = "intra"
 
-    for item in ["bandwidth", "residual_bandwidth", "latency", "packet_loss", "availability"]:
+    for item in [
+            "bandwidth",
+            "residual_bandwidth",
+            "latency",
+            "packet_loss",
+            "availability"]:
         if item in kytos_link["metadata"]:
             link[item] = kytos_link["metadata"][item]
         else:
@@ -195,7 +226,7 @@ def get_links(kytos_links, oxp_url):
     if kytos_links == "":
         raise ValueError("Kytos_links CANNOT be empty")
 
-    links = list()
+    links = []
 
     for kytos_link in kytos_links.values():
         if kytos_link["enabled"]:
@@ -204,9 +235,6 @@ def get_links(kytos_links, oxp_url):
                 links.append(link)
 
     return links
-
-
-
 
 
 def update_nni(nodes, links):
@@ -238,12 +266,12 @@ def create_inter_oxp_link_entries(oxp_url, nodes, links):
                 if oxp_url not in interface["metadata"]["nni"]:
                     # inter-domain
 
-                    link = dict()
+                    link = {}
 
                     if "link_name" in interface["metadata"]:
                         link["name"] = interface["metadata"]["link_name"]
                     else:
-                        link["name"] = "NO_NAME_%s" % randint(0, 100000)
+                        link["name"] = f'NO_NAME_{randrange(0, 100000)}'
 
                     link["id"] = f"urn:sdx:link:{oxp_url}:{link['name']}"
 

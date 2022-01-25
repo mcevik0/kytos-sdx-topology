@@ -17,6 +17,7 @@ class ParseTopology:
         self.model_version = parse_args["model_version"]
         self.oxp_name = parse_args["oxp_name"]
         self.oxp_url = parse_args["oxp_url"]
+        self.valid_sdx = None
 
     def get_kytos_nodes(self):
         """ return parse_args["topology"]["switches"] values """
