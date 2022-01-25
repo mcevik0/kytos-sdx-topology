@@ -134,6 +134,7 @@ let g:ale_linters = {
 black --check --diff main.py
 
 black main.py
+black --line-length 80 main.py
 
 # Isort
 
