@@ -165,10 +165,8 @@ class Main(KytosNApp):
     @rest("v1/validate", methods=["POST"])
     def get_validate(self):
         """ REST to validate the topology following the SDX data model"""
-        log.info("########### validating #####################")
-        log.info(self.topology_dict)
-        log.info("########### request #####################")
-        log.info(request)
+        log.debug("########### validating topology  #####################")
+        log.debug(self.topology_dict)
         try:
             data = request.json
         except BadRequest:
@@ -179,8 +177,6 @@ class Main(KytosNApp):
             result = "The request body mimetype is not application/json."
             log.info("update result %s %s", result, 415)
             raise UnsupportedMediaType(result)
-        log.info("########### data #####################")
-        log.info(data)
         response = validate_request(spec, request)
         return jsonify(response["data"]), response["code"]
 

@@ -6,7 +6,6 @@ from openapi_core.contrib.flask import FlaskOpenAPIRequest
 from openapi_core.validation.request.validators import RequestValidator
 from openapi_spec_validator import validate_spec
 from openapi_spec_validator.readers import read_from_filename
-from kytos.core import log
 from kytos.core.events import KytosEvent
 
 
@@ -46,8 +45,6 @@ def validate_request(spec, data_request):
     validator = RequestValidator(spec)
     openapi_request = FlaskOpenAPIRequest(data_request)
     result = validator.validate(openapi_request)
-    print('############ result ####################')
-    print(result)
     if result.errors:
         errors = result.errors[0]
         if hasattr(errors, "schema_errors"):
@@ -62,7 +59,5 @@ def validate_request(spec, data_request):
                 }
         else:
             error_response = {"errors": errors}
-        log.info('############ error_response ####################')
-        log.info("error response: %s", error_response)
         return {"data": error_response, "code": 400}
     return {"data": data_request.json, "code": 200}
