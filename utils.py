@@ -37,7 +37,7 @@ def load_spec():
     return create_spec(spec_dict)
 
 
-def validate(spec, data_request):
+def validate_request(spec, data_request):
     """Decorator to validate a REST endpoint input.
 
     Uses the schema defined in the openapi.yml file

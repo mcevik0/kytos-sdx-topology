@@ -14,7 +14,7 @@ from napps.kytos.sdx_topology import (settings,  # pylint: disable=E0401
                                       storehouse)
 from napps.kytos.sdx_topology.topology_class import \
     ParseTopology  # pylint: disable=E0401
-from napps.kytos.sdx_topology.utils import load_spec, validate  \
+from napps.kytos.sdx_topology.utils import load_spec, validate_request  \
         # pylint: disable=E0401
 
 
@@ -167,6 +167,8 @@ class Main(KytosNApp):
         """ REST to validate the topology following the SDX data model"""
         log.info("########### validating #####################")
         log.info(self.topology_dict)
+        log.info("########### request #####################")
+        log.info(request)
         try:
             data = request.json
         except BadRequest:
@@ -177,7 +179,9 @@ class Main(KytosNApp):
             result = "The request body mimetype is not application/json."
             log.info("update result %s %s", result, 415)
             raise UnsupportedMediaType(result)
-        response = validate(spec, request)
+        log.info("########### data #####################")
+        log.info(data)
+        response = validate_request(spec, request)
         return jsonify(response["data"]), response["code"]
 
     @rest("v1/topology")
