@@ -13,6 +13,8 @@ from napps.kytos.sdx_topology import settings, storehouse \
         # pylint: disable=E0401
 from napps.kytos.sdx_topology.topology_class import ParseTopology \
         # pylint: disable=E0401
+from napps.kytos.sdx_topology.utils import load_spec, validate  \
+        # pylint: disable=E0401
 
 
 class Main(KytosNApp):
@@ -20,6 +22,7 @@ class Main(KytosNApp):
 
     This class is the entry point for this NApp.
     """
+    spec = load_spec()
 
     def setup(self):
         """Replace the '__init__' method for the KytosNApp subclass.
@@ -31,6 +34,7 @@ class Main(KytosNApp):
         """
         self.topology_loaded = False
         self.storehouse = None
+        self.topology_dict = {}
 
     def execute(self):
         """Run after the setup method execution.
@@ -155,6 +159,13 @@ class Main(KytosNApp):
 
         return jsonify(self.oxp_name), 200
 
+    @rest("v1/validate", methods=["POST"])
+    @validate(spec)
+    def get_validate(self):
+        """ REST to validate the topology following the SDX data model"""
+        log.info("########### validating #####################")
+        return self.topology_dict
+
     @rest("v1/topology")
     def get_topology_version(self):
         """ REST to return the topology following the SDX data model"""
@@ -177,10 +188,10 @@ class Main(KytosNApp):
                 "model_version": topology_update["model_version"],
                 "timestamp": topology_update["timestamp"],
                 "nodes": topology_update["nodes"],
-                "links": topology_update["links"],
-            }
+                "links": topology_update["links"]}
+            self.topology_dict = topology_dict  # pylint: disable=W0201
             validate_topology = requests.post(
-                settings.VALIDATE_TOPOLOGY, json=topology_dict
+                settings.VALIDATE_TOPOLOGY, json=self.topology_dict
             )
             if validate_topology.status_code == 200:
                 return jsonify(topology_update), 200
