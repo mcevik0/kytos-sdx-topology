@@ -13,8 +13,6 @@ from napps.kytos.sdx_topology import settings, storehouse \
         # pylint: disable=E0401
 from napps.kytos.sdx_topology.topology_class import ParseTopology \
         # pylint: disable=E0401
-from napps.kytos.sdx_topology.utils import load_spec, validate \
-        # pylint: disable=E0401
 
 
 class Main(KytosNApp):
@@ -22,8 +20,6 @@ class Main(KytosNApp):
 
     This class is the entry point for this NApp.
     """
-
-    spec = load_spec()
 
     def setup(self):
         """Replace the '__init__' method for the KytosNApp subclass.
@@ -35,7 +31,6 @@ class Main(KytosNApp):
         """
         self.topology_loaded = False
         self.storehouse = None
-        self.valid_sdx = None
 
     def execute(self):
         """Run after the setup method execution.
@@ -159,12 +154,6 @@ class Main(KytosNApp):
             return jsonify("Incorrect Type submitted"), 401
 
         return jsonify(self.oxp_name), 200
-
-    @rest("v1/validate", methods=["POST"])
-    @validate(spec)
-    def validate_topology(self):
-        """ Return the valid sdx topology following the SDX data model"""
-        self.oxp_validate = request.get_json()
 
     @rest("v1/topology")
     def get_topology_version(self):
