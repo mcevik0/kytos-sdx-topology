@@ -6,15 +6,19 @@ SDX API
 
 import requests
 from flask import jsonify, request
+from werkzeug.exceptions import BadRequest, UnsupportedMediaType
 
 from kytos.core import KytosNApp, log, rest
 from kytos.core.helpers import listen_to
-from napps.kytos.sdx_topology import settings, storehouse \
-        # pylint: disable=E0401
-from napps.kytos.sdx_topology.topology_class import ParseTopology \
-        # pylint: disable=E0401
+from napps.kytos.sdx_topology import (settings,  # pylint: disable=E0401
+                                      storehouse)
+from napps.kytos.sdx_topology.topology_class import \
+    ParseTopology  # pylint: disable=E0401
 from napps.kytos.sdx_topology.utils import load_spec, validate  \
         # pylint: disable=E0401
+
+
+spec = load_spec()
 
 
 class Main(KytosNApp):
@@ -22,7 +26,6 @@ class Main(KytosNApp):
 
     This class is the entry point for this NApp.
     """
-    spec = load_spec()
 
     def setup(self):
         """Replace the '__init__' method for the KytosNApp subclass.
@@ -160,11 +163,22 @@ class Main(KytosNApp):
         return jsonify(self.oxp_name), 200
 
     @rest("v1/validate", methods=["POST"])
-    @validate(spec)
     def get_validate(self):
         """ REST to validate the topology following the SDX data model"""
         log.info("########### validating #####################")
-        return self.topology_dict
+        log.info(self.topology_dict)
+        try:
+            data = request.json
+        except BadRequest:
+            result = "The request body is not a well-formed JSON."
+            log.info("Validate data result %s %s", result, 400)
+            raise BadRequest(result) from BadRequest
+        if data is None:
+            result = "The request body mimetype is not application/json."
+            log.info("update result %s %s", result, 415)
+            raise UnsupportedMediaType(result)
+        response = validate(spec, request)
+        return jsonify(response["data"]), response["code"]
 
     @rest("v1/topology")
     def get_topology_version(self):
@@ -191,7 +205,7 @@ class Main(KytosNApp):
                 "links": topology_update["links"]}
             self.topology_dict = topology_dict  # pylint: disable=W0201
             validate_topology = requests.post(
-                settings.VALIDATE_TOPOLOGY, json=self.topology_dict
+                settings.VALIDATE_TOPOLOGY, json=topology_dict
             )
             if validate_topology.status_code == 200:
                 return jsonify(topology_update), 200

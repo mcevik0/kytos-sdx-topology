@@ -6,7 +6,7 @@ info:
   contact:
     email: lmarinve@fiu.edu
 servers:
-  - url: 'http://3.218.56.104:8000'
+  - url: 'http://3.218.56.104:8181'
 tags:
 - name: topology
   description: Everything about your domain topology
