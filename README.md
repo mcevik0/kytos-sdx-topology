@@ -120,7 +120,7 @@ call vundle#end()            " required
 filetype plugin indent on    " required
 
 let g:ale_linters = {
-        \   'python': ['flake8', 'pylint', 'bandit', 'pycodestyle'],
+        \   'python': ['flake8', 'pylint', 'pycodestyle'],
         \}
 
 
@@ -139,3 +139,12 @@ black --line-length 80 main.py
 # Isort
 
 isort main.py
+
+# Bandit
+
+bandit --configfile bandit.yaml
+
+// with the following bandit.yaml in the project's root directory
+
+assert_used:
+  skips: ['*_test.py', 'test_*.py']
