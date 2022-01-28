@@ -3,7 +3,6 @@ Main class of kytos/sdx_topology Kytos Network Application.
 
 SDX API
 """
-
 import datetime
 import secrets
 
@@ -11,13 +10,12 @@ import secrets
 class ParseTopology:
     """Parse Topology  class of kytos/sdx_topology NApp."""
 
-    def __init__(self):
-        self.kytos_topology = None
-        self.version = None
-        self.model_version = None
-        self.oxp_name = None
-        self.oxp_url = None
-        self.valid_sdx = None
+    def __init__(self, topology, version, model_version, oxp_name, oxp_url):
+        self.kytos_topology = topology
+        self.version = version
+        self.model_version = model_version
+        self.oxp_name = oxp_name
+        self.oxp_url = oxp_url
 
     def get_kytos_nodes(self):
         """ return parse_args["topology"]["switches"] values """
@@ -106,8 +104,7 @@ class ParseTopology:
 
         sdx_port = {}
         sdx_port["id"] = self.get_port_urn(
-            sdx_node_name, interface["port_number"]
-        )
+                sdx_node_name, interface["port_number"])
         sdx_port["name"] = interface["name"]
         sdx_port["node"] = f"urn:sdx:node:{self.oxp_url}:{sdx_node_name}"
         sdx_port["type"] = self.get_type_port_speed(interface["speed"])
@@ -127,7 +124,7 @@ class ParseTopology:
 
     def get_ports(self, sdx_node_name, interfaces):
         """Function that calls the main individual get_port function,
-        to get a full list of ports from a node/ interface"""
+        to get a full list of ports from a node/ interface """
         ports = []
         for interface in interfaces.values():
             port_no = interface["port_number"]
@@ -137,8 +134,7 @@ class ParseTopology:
         return ports
 
     def get_kytos_nodes_names(self):
-        """Function to retrieve the data_path attribute for every switch form \
-                Kytos's topology API"""
+        """retrieve the data_path attribute for every Kytos topology switch"""
         nodes_mappings = {}
 
         for node in self.get_kytos_nodes():
@@ -150,10 +146,9 @@ class ParseTopology:
         return nodes_mappings
 
     def get_sdx_node(self, kytos_node):
-        """function that builds every Node dictionary object with all the \
-                necessary
-        attributes that make a Node object; the name, id, location and list of
-        ports."""
+        """function that builds every Node dictionary object with all the
+        necessary attributes that make a Node object; the name, id, location
+        and list of ports."""
         sdx_node = {}
 
         if "node_name" in kytos_node["metadata"]:
@@ -168,22 +163,18 @@ class ParseTopology:
             sdx_node["location"]["address"] = kytos_node["metadata"]["address"]
         if "lat" in kytos_node["metadata"]:
             sdx_node["location"]["latitude"] = float(
-                kytos_node["metadata"]["lat"]
-            )
+                    kytos_node["metadata"]["lat"])
         if "lng" in kytos_node["metadata"]:
             sdx_node["location"]["longitude"] = float(
-                kytos_node["metadata"]["lng"]
-            )
+                    kytos_node["metadata"]["lng"])
 
         sdx_node["ports"] = self.get_ports(
-            sdx_node["name"], kytos_node["interfaces"]
-        )
+                sdx_node["name"], kytos_node["interfaces"])
 
         return sdx_node
 
     def get_sdx_nodes(self):
-        """function that returns a list of SDX Nodes objects for every Kytos \
-                node in the topology"""
+        """returns a SDX Nodes objects list for every Kytos node in topology"""
         sdx_nodes = []
         for kytos_node in self.get_kytos_nodes():
             if kytos_node["enabled"]:
@@ -208,8 +199,8 @@ class ParseTopology:
         return f"urn:sdx:port:{self.oxp_url}:{switch_name}:{interface}"
 
     def get_sdx_link(self, kytos_link):
-        """function that generates a dictionary object for every link in a \
-                network, and containing all the attributes for each link"""
+        """generates a dictionary object for every link in a network,
+        and containing all the attributes for each link"""
 
         sdx_link = {}
         interface_a = int(kytos_link["endpoint_a"]["id"].split(":")[8])
@@ -227,34 +218,29 @@ class ParseTopology:
             self.get_sdx_port_urn(switch_a, interface_a),
             self.get_sdx_port_urn(switch_b, interface_b),
         ]
-
         sdx_link["type"] = "intra"
 
         for item in [
-            "bandwidth",
-            "residual_bandwidth",
-            "latency",
-            "packet_loss",
-            "availability",
-        ]:
+                "bandwidth",
+                "residual_bandwidth",
+                "latency",
+                "packet_loss",
+                "availability"]:
             if item in kytos_link["metadata"]:
                 sdx_link[item] = kytos_link["metadata"][item]
             else:
                 if item in ["bandwidth"]:
                     sdx_link[item] = self.get_link_port_speed(
-                        kytos_link["endpoint_a"]["speed"]
-                    )
+                            kytos_link["endpoint_a"]["speed"])
                 elif item in ["residual_bandwidth", "availability"]:
                     sdx_link[item] = 100
                 else:
                     sdx_link[item] = 0
 
         sdx_link["status"] = (
-            "up" if kytos_link["endpoint_a"]["active"] else "down"
-        )
+            "up" if kytos_link["endpoint_a"]["active"] else "down")
         sdx_link["state"] = (
-            "enabled" if kytos_link["endpoint_a"]["enabled"] else "disabled"
-        )
+            "enabled" if kytos_link["endpoint_a"]["enabled"] else "disabled")
 
         return sdx_link
 
@@ -284,8 +270,7 @@ class ParseTopology:
 
                         if "link_name" in kytos_interface["metadata"]:
                             sdx_link["name"] = kytos_interface["metadata"][
-                                "link_name"
-                            ]
+                                    "link_name"]
                         else:
                             sdx_link[
                                 "name"
@@ -332,13 +317,8 @@ class ParseTopology:
                         del sdx_link
         return sdx_links
 
-    def get_sdx_topology(self, parse_args):
+    def get_sdx_topology(self):
         """ function get_sdx_topology """
-        self.kytos_topology = parse_args["topology"]
-        self.version = parse_args["version"]
-        self.model_version = parse_args["model_version"]
-        self.oxp_name = parse_args["oxp_name"]
-        self.oxp_url = parse_args["oxp_url"]
         topology = {}
         topology["name"] = self.oxp_name
         topology["id"] = f"urn:sdx:topology:{self.oxp_url}"

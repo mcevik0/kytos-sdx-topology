@@ -1,5 +1,5 @@
 """
-Main module of kytos/sdx_topology Kytos Network Application.
+Main module of amlight/sdx Kytos Network Application.
 
 SDX API
 """
@@ -7,13 +7,15 @@ SDX API
 import requests
 from flask import jsonify, request
 from werkzeug.exceptions import BadRequest, UnsupportedMediaType
-
 from kytos.core import KytosNApp, log, rest
 from kytos.core.helpers import listen_to
-from napps.kytos.sdx_topology import (settings,  # pylint: disable=E0401
-                                      storehouse)
-from napps.kytos.sdx_topology.topology_class import \
-    ParseTopology  # pylint: disable=E0401
+
+import napps.kytos.sdx_topology.storehouse as store_house  \
+        # pylint: disable=E0401
+from napps.kytos.sdx_topology import settings  # pylint: disable=E0401
+from napps.kytos.sdx_topology.topology_class import ParseTopology  \
+        # pylint: disable=E0401
+
 from napps.kytos.sdx_topology.utils import load_spec, validate_request  \
         # pylint: disable=E0401
 
@@ -22,7 +24,7 @@ spec = load_spec()
 
 
 class Main(KytosNApp):
-    """Main class of kytos/sdx_topology NApp.
+    """Main class of amlight/sdx NApp.
 
     This class is the entry point for this NApp.
     """
@@ -36,8 +38,7 @@ class Main(KytosNApp):
         So, if you have any setup routine, insert it here.
         """
         self.topology_loaded = False
-        # self.storehouse = None
-        self.topology_dict = {}
+        self.storehouse = None
 
     def execute(self):
         """Run after the setup method execution.
@@ -58,9 +59,12 @@ class Main(KytosNApp):
     @property
     def oxp_url(self):
         """ Property for OXP_URL """
-        if self.load_storehouse():
+        try:
+            self.load_storehouse()
             return self.storehouse.get_data()["oxp_url"]
-        return ""
+        except Exception as err:  # pylint: disable=W0703
+            log.info(err)
+            return ""
 
     @oxp_url.setter
     def oxp_url(self, oxp_url):
@@ -70,37 +74,31 @@ class Main(KytosNApp):
     @property
     def oxp_name(self):
         """ Property for OXP_NAME """
-        log.info(" ##### oxp_name getter ####")
-        if self.load_storehouse() is not None:
-            log.info(
-                    "self.storehouse.get_data:%s",
-                    self.storehouse.get_data()["oxp_name"])
+        try:
+            self.load_storehouse()
             return self.storehouse.get_data()["oxp_name"]
-        log.info(" ##### oxp_name getter load storehouse is none ####")
-        return ""
+        except Exception as err:  # pylint: disable=W0703
+            log.info(err)
+            return ""
 
     @oxp_name.setter
     def oxp_name(self, oxp_name):
         """ Property for OXP_URL """
-        log.info(" ##### oxp_name setter ####")
-        log.info("oxp_name:%s", oxp_name)
         self.storehouse.save_oxp_name(oxp_name)
 
-    @listen_to("kytos/storehouse.loaded")
+    @listen_to('kytos/storehouse.loaded')
     def load_storehouse(self, event=None):  # pylint: disable=W0613
-        """Function meant for validation, to make sure that the storehouse \
-                napp has been loaded before all the other functions that use \
-                it begins to call it."""
+        """Function meant for validation, to make sure that the storehouse
+        napp has been loaded before all the other functions that use it begins
+        to call it."""
         log.info("Loading Storehouse")
-        self.storehouse = storehouse.StoreHouse(self.controller)  \
-            # pylint: disable=W0201
-        log.info("self.storehouse:%s", self.storehouse)
+        self.storehouse = store_house(self.controller)  # pylint: disable=W0201
 
-    @listen_to("kytos/topology.*")
+    @listen_to('kytos/topology.*')
     def load_topology(self, event=None):  # pylint: disable=W0613
-        """Function meant for validation, to make sure that the storehouse \
-                napp has been loaded before all the other functions that use \
-                it begins to call it."""
+        """Function meant for validation, to make sure that the storehouse
+        napp has been loaded before all the other functions that use it begins
+        to call it."""
         if not self.topology_loaded:
             if self.storehouse:
                 if self.storehouse.box is not None:
@@ -109,7 +107,7 @@ class Main(KytosNApp):
             else:
                 self.topology_loaded = True  # pylint: disable=W0201
 
-    @listen_to("kytos/topology.unloaded")
+    @listen_to('kytos/topology.unloaded')
     def unload_topology(self):  # pylint: disable=W0613
         """Function meant for validation, to make sure that the storehouse napp
         has been loaded before all the other functions that use it begins to
@@ -118,25 +116,28 @@ class Main(KytosNApp):
 
     def test_kytos_topology(self):
         """ Test if the Topology napp has loaded """
-        if "_" == self.get_kytos_topology():
+        try:
+            _ = self.get_kytos_topology()
             return True
-        return False
+        except Exception as err:  # pylint: disable=W0703
+            log.info(err)
+            return False
 
     @staticmethod
     def get_kytos_topology():
         """retrieve topology from API"""
-        kytos_topology = requests.get(settings.KYTOS_TOPOLOGY_URL).json()
+        kytos_topology = requests.get(settings.topology_url).json()
         return kytos_topology["topology"]
 
-    @rest("v1/oxp_url", methods=["GET"])
+    @rest('v1/oxp_url', methods=['GET'])
     def get_oxp_url(self):
         """ REST endpoint to RETRIEVE the SDX napp oxp_url"""
         return jsonify(self.oxp_url), 200
 
-    @rest("v1/oxp_url", methods=["POST"])
+    @rest('v1/oxp_url', methods=['POST'])
     def set_oxp_url(self):
-        """ REST endpoint to provide the SDX napp with the url provided \
-                by the operator"""
+        """ REST endpoint to provide the SDX napp with the url provided by the
+        operator"""
         try:
             self.oxp_url = request.get_json()
 
@@ -149,15 +150,15 @@ class Main(KytosNApp):
 
         return jsonify(self.oxp_url), 200
 
-    @rest("v1/oxp_name", methods=["GET"])
+    @rest('v1/oxp_name', methods=['GET'])
     def get_oxp_name(self):
         """ REST endpoint to RETRIEVE the SDX napp domain_name"""
         return jsonify(self.oxp_name), 200
 
-    @rest("v1/oxp_name", methods=["POST"])
+    @rest('v1/oxp_name', methods=['POST'])
     def set_oxp_name(self):
-        """ REST endpoint to provide the SDX napp with the domain_name \
-                provided by the operator"""
+        """ REST endpoint to provide the SDX napp with the domain_name provided
+        by the operator"""
         try:
             self.oxp_name = request.get_json()
 
@@ -174,73 +175,70 @@ class Main(KytosNApp):
     def get_validate(self):
         """ REST to validate the topology following the SDX data model"""
         log.debug("########### validating topology  #####################")
-        log.debug(self.topology_dict)
-        try:
-            data = request.json
-        except BadRequest:
-            result = "The request body is not a well-formed JSON."
-            log.info("Validate data result %s %s", result, 400)
-            raise BadRequest(result) from BadRequest
-        if data is None:
-            result = "The request body mimetype is not application/json."
-            log.info("update result %s %s", result, 415)
-            raise UnsupportedMediaType(result)
-        response = validate_request(spec, request)
-        return jsonify(response["data"]), response["code"]
+        if self.topology_loaded or self.test_kytos_topology():
+            try:
+                data = request.json
+            except BadRequest:
+                result = "The request body is not a well-formed JSON."
+                log.info("Validate data result %s %s", result, 400)
+                raise BadRequest(result) from BadRequest
+            if data is None:
+                result = "The request body mimetype is not application/json."
+                log.info("update result %s %s", result, 415)
+                raise UnsupportedMediaType(result)
+            response = validate_request(spec, request)
+            return jsonify(response["data"]), response["code"]
+        # debug only
+        log.info(self.topology_loaded)
+        log.info(self.test_kytos_topology())
+        return jsonify("Topology napp has not loaded"), 401
 
-    @rest("v1/topology")
+    @rest('v1/topology')
     def get_topology_version(self):
         """ REST to return the topology following the SDX data model"""
         if not self.oxp_url:
             return jsonify(
-                    "Submit oxp_url previous to requesting topology schema"),\
-                            401
+                    "Submit oxp_url previous to request topology schema"), 401
+
         if not self.oxp_name:
-            return (
-                jsonify(
-                    "Submit oxp_name previous to requesting topology schema"),
-                401,
-            )
+            return jsonify(
+                    "Submit oxp_name previous to request topology schema"), 401
+
         if self.topology_loaded or self.test_kytos_topology():
-            topology_update = self.create_update_topology()
-            topology_dict = {
-                "id": topology_update["id"],
-                "name": topology_update["name"],
-                "version": topology_update["version"],
-                "model_version": topology_update["model_version"],
-                "timestamp": topology_update["timestamp"],
-                "nodes": topology_update["nodes"],
-                "links": topology_update["links"]}
-            self.topology_dict = topology_dict  # pylint: disable=W0201
-            validate_topology = requests.post(
-                settings.VALIDATE_TOPOLOGY, json=topology_dict
-            )
-            if validate_topology.status_code == 200:
-                return jsonify(topology_update), 200
-            return jsonify(validate_topology.json()), 400
+            try:
+                topology_update = self.create_update_topology()
+                topology_dict = {
+                        "id": topology_update["id"],
+                        "name": topology_update["name"],
+                        "version": topology_update["version"],
+                        "model_version": topology_update["model_version"],
+                        "timestamp": topology_update["timestamp"],
+                        "nodes": topology_update["nodes"],
+                        "links": topology_update["links"]
+                        }
+                validate_topology = requests.post(
+                        settings.validate_topology, json=topology_dict)
+                if validate_topology.status_code == 200:
+                    return jsonify(topology_update), 200
+                return jsonify(validate_topology.json()), 400
+            except Exception as err:  # pylint: disable=W0703
+                log.info(err)
+                return jsonify("Validation Error"), 400
+
         # debug only
         log.info(self.topology_loaded)
         log.info(self.test_kytos_topology())
         return jsonify("Topology napp has not loaded"), 401
 
     def create_update_topology(self):
-        """Function that will take care of initializing the namespace
-        kytos.storehouse.version within the storehouse and create a
-        box object containing the version data that will be updated
-        every time a change is detected in the topology."""
-        log.info("############# create_update_topology ##############")
-        parse_args = {
-            "topology": self.get_kytos_topology(),
-            "version": self.storehouse.get_data()["version"],
-            "model_version": "1.0.0",
-            "oxp_name": self.oxp_name,
-            "oxp_url": self.oxp_url
-        }
-        log.info("parse_args:%s", parse_args)
-        if parse_args["topology"] is not None and parse_args["version"] \
-                is not None and parse_args["model_version"] is not None and \
-                parse_args["oxp_name"] is not None and parse_args["oxp_url"] \
-                is not None:
-            self.storehouse.update_box()
-            return ParseTopology().get_sdx_topology(parse_args)
-        return {}
+        """ Function that will take care of initializing the namespace
+         kytos.storehouse.version within the storehouse and create a
+         box object containing the version data that will be updated
+         every time a change is detected in the topology."""
+        self.storehouse.update_box()
+        version = self.storehouse.get_data()["version"]
+        return ParseTopology(topology=self.get_kytos_topology(),
+                             version=version,
+                             model_version="1.0.0",
+                             oxp_name=self.oxp_name,
+                             oxp_url=self.oxp_url).get_sdx_topology()
