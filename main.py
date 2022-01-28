@@ -72,23 +72,6 @@ class Main(KytosNApp):
         StoreHouse.save_oxp_url(oxp_url)
         self.load_topology()
 
-    @property
-    def oxp_name(self):
-        """ Property for OXP_NAME """
-        try:
-            log.info("##### Property for OXP_NAME #####")
-            return StoreHouse.get_data()["oxp_name"]
-        except Exception as err:  # pylint: disable=W0703
-            log.info(err)
-            return ""
-
-    @oxp_name.setter
-    def oxp_name(self, oxp_name):
-        """ Setter for OXP_NAME """
-        log.info("##### Setter for OXP_NAME #####")
-        StoreHouse.save_oxp_name(oxp_name)
-        self.load_topology()
-
     @listen_to("kytos/topology.*")
     def load_topology(self, event=None):  # pylint: disable=W0613
         """Function meant for validation, to make sure that the storehouse
@@ -148,23 +131,26 @@ class Main(KytosNApp):
     @rest("v1/oxp_name", methods=["GET"])
     def get_oxp_name(self):
         """ REST endpoint to RETRIEVE the SDX napp domain_name"""
-        return jsonify(self.oxp_name), 200
+        return jsonify(StoreHouse.get_data()["oxp_name"]), 200
 
     @rest("v1/oxp_name", methods=["POST"])
     def set_oxp_name(self):
         """REST endpoint to provide the SDX napp with the domain_name provided
         by the operator"""
-        try:
-            self.oxp_name = request.get_json()
+        if self.topology_loaded or self.test_kytos_topology():
+            try:
+                oxp_name = request.get_json()
 
-        except Exception as err:  # pylint: disable=W0703
-            log.info(err)
-            return jsonify(err), 401
+            except BadRequest:
+                result = "The request body is not a well-formed JSON."
+                log.info("oxp_name result %s %s", result, 400)
+                raise BadRequest(result) from BadRequest
 
-        if not isinstance(self.oxp_name, str):
+        if not isinstance(oxp_name, str):
             return jsonify("Incorrect Type submitted"), 401
 
-        return jsonify(self.oxp_name), 200
+        StoreHouse.save_oxp_name(request.get_json())
+        return jsonify(oxp_name), 200
 
     @rest("v1/validate", methods=["POST"])
     def get_validate(self):
