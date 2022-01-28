@@ -10,7 +10,8 @@ from werkzeug.exceptions import BadRequest, UnsupportedMediaType
 from kytos.core import KytosNApp, log, rest
 from kytos.core.helpers import listen_to
 
-import napps.kytos.sdx_topology.storehouse  # pylint: disable=E0401
+from napps.kytos.sdx_topology.storehouse import StoreHouse  \
+        # pylint: disable=E0401
 from napps.kytos.sdx_topology import settings  # pylint: disable=E0401
 from napps.kytos.sdx_topology.topology_class import (ParseTopology) \
         # pylint: disable=E0401
@@ -37,7 +38,6 @@ class Main(KytosNApp):
         So, if you have any setup routine, insert it here.
         """
         self.topology_loaded = False
-        self.storehouse = None
 
     def execute(self):
         """Run after the setup method execution.
@@ -59,31 +59,37 @@ class Main(KytosNApp):
     def oxp_url(self):
         """ Property for OXP_URL """
         try:
+            log.info("##### Property for OXP_URL #####")
             self.load_storehouse()
-            return self.storehouse.get_data()["oxp_url"]
+            return StoreHouse.get_data()["oxp_url"]
         except Exception as err:  # pylint: disable=W0703
             log.info(err)
             return ""
 
     @oxp_url.setter
     def oxp_url(self, oxp_url):
-        """ Property for OXP_URL """
-        self.storehouse.save_oxp_url(oxp_url)
+        """ Setter for OXP_URL """
+        log.info("##### Setter for OXP_URL #####")
+        log.info(self.load_storehouse())
+        StoreHouse.save_oxp_url(oxp_url)
 
     @property
     def oxp_name(self):
         """ Property for OXP_NAME """
         try:
+            log.info("##### Property for OXP_NAME #####")
             self.load_storehouse()
-            return self.storehouse.get_data()["oxp_name"]
+            return StoreHouse.get_data()["oxp_name"]
         except Exception as err:  # pylint: disable=W0703
             log.info(err)
             return ""
 
     @oxp_name.setter
     def oxp_name(self, oxp_name):
-        """ Property for OXP_URL """
-        self.storehouse.save_oxp_name(oxp_name)
+        """ Setter for OXP_NAME """
+        log.info("##### Setter for OXP_NAME #####")
+        log.info(self.load_storehouse())
+        StoreHouse.save_oxp_name(oxp_name)
 
     @listen_to("kytos/storehouse.loaded")
     def load_storehouse(self, event=None):  # pylint: disable=W0613
@@ -91,13 +97,13 @@ class Main(KytosNApp):
         napp has been loaded before all the other functions that use it begins
         to call it."""
         log.info("##### Loading Storehouse #####")
-        self.storehouse = napps.kytos.sdx_topology.storehouse(self.controller)\
-            # pylint: disable=W0201
-        log.info("self.storehouse:%s", self.storehouse)
-        log.info("__dict__:%s", self.storehouse.__dict__)
-        if self.storehouse is not None:
-            log.info("##### storehouse oxp_name #####")
-            log.info(self.storehouse.get_data()["oxp_name"])
+        log.info("self.storehouse:%s", StoreHouse(self.controller))
+        log.info("__dict__:%s", StoreHouse.__dict__)
+        log.info("##### Loading Storehouse 2 #####")
+        if StoreHouse is not None:
+            log.info("##### load storehouse get data oxp_name #####")
+            log.info(StoreHouse.get_data()["oxp_name"])
+        log.info("##### Loading Storehouse 3 #####")
 
     @listen_to("kytos/topology.*")
     def load_topology(self, event=None):  # pylint: disable=W0613
@@ -105,8 +111,8 @@ class Main(KytosNApp):
         napp has been loaded before all the other functions that use it begins
         to call it."""
         if not self.topology_loaded:
-            if self.storehouse:
-                if self.storehouse.box is not None:
+            if StoreHouse is not None:
+                if StoreHouse.box is not None:
                     self.create_update_topology()
                     self.topology_loaded = True  # pylint: disable=W0201
             else:
@@ -245,8 +251,9 @@ class Main(KytosNApp):
         kytos.storehouse.version within the storehouse and create a
         box object containing the version data that will be updated
         every time a change is detected in the topology."""
-        self.storehouse.update_box()
-        version = self.storehouse.get_data()["version"]
+        log.info("##### create_update_topology ######")
+        StoreHouse.update_box()
+        version = StoreHouse.get_data()["version"]
         return ParseTopology(
             topology=self.get_kytos_topology(),
             version=version,
