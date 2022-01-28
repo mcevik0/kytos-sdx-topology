@@ -217,10 +217,10 @@ def get_link(kytos_link, oxp_url):
     return link
 
 
-def get_links(kytos_links, oxp_url):
+def get_links(topology, oxp_url):
     """function that returns a list of Link objects based on the network's
     devices connections to each other"""
-
+    kytos_links = topology["links"]
     if kytos_links == "":
         raise ValueError("Kytos_links CANNOT be empty")
 
@@ -313,8 +313,8 @@ def get_topology(kytos_topology, version, oxp_name, oxp_url):
     topology["version"] = version
     topology["timestamp"] = datetime.datetime.now().isoformat()[19]+"Z"
     topology["model_version"] = "1.0.0"
-    topology["nodes"] = get_nodes(kytos_topology["switches"], oxp_url)
-    topology["links"] = get_links(kytos_topology["links"], oxp_url)
+    topology["nodes"] = get_nodes(kytos_topology, oxp_url)
+    topology["links"] = get_links(kytos_topology, oxp_url)
 
     update_nni(topology["nodes"], topology["links"])
 
