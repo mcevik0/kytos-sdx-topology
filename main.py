@@ -36,7 +36,7 @@ class Main(KytosNApp):
         So, if you have any setup routine, insert it here.
         """
         self.topology_loaded = False
-        self.storehouse = None
+        # self.storehouse = None
         self.topology_dict = {}
 
     def execute(self):
@@ -70,13 +70,20 @@ class Main(KytosNApp):
     @property
     def oxp_name(self):
         """ Property for OXP_NAME """
-        if self.load_storehouse():
+        log.info(" ##### oxp_name getter ####")
+        if self.load_storehouse() is not None:
+            log.info(
+                    "self.storehouse.get_data:%s",
+                    self.storehouse.get_data()["oxp_name"])
             return self.storehouse.get_data()["oxp_name"]
+        log.info(" ##### oxp_name getter load storehouse is none ####")
         return ""
 
     @oxp_name.setter
     def oxp_name(self, oxp_name):
         """ Property for OXP_URL """
+        log.info(" ##### oxp_name setter ####")
+        log.info("oxp_name:%s", oxp_name)
         self.storehouse.save_oxp_name(oxp_name)
 
     @listen_to("kytos/storehouse.loaded")
@@ -87,6 +94,7 @@ class Main(KytosNApp):
         log.info("Loading Storehouse")
         self.storehouse = storehouse.StoreHouse(self.controller)  \
             # pylint: disable=W0201
+        log.info("self.storehouse:%s", self.storehouse)
 
     @listen_to("kytos/topology.*")
     def load_topology(self, event=None):  # pylint: disable=W0613
@@ -228,7 +236,7 @@ class Main(KytosNApp):
             "oxp_name": self.oxp_name,
             "oxp_url": self.oxp_url
         }
-        log.info(parse_args)
+        log.info("parse_args:%s", parse_args)
         if parse_args["topology"] is not None and parse_args["version"] \
                 is not None and parse_args["model_version"] is not None and \
                 parse_args["oxp_name"] is not None and parse_args["oxp_url"] \
