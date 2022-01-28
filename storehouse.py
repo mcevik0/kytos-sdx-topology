@@ -23,6 +23,7 @@ class StoreHouse:
 
     def __init__(self, controller):
         """Create a storehouse instance."""
+        log.info("##### Create a storehouse instance.#####")
         self.controller = controller
         self.namespace = 'kytos.sdx.storehouse.version'
         self._lock = threading.Lock()
