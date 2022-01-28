@@ -47,7 +47,7 @@ class Main(KytosNApp):
 
             self.execute_as_loop(30)  # 30-second interval.
         """
-        self.load_storehouse()
+        self.load_topology()
 
     def shutdown(self):
         """Run when your NApp is unloaded.
@@ -60,7 +60,6 @@ class Main(KytosNApp):
         """ Property for OXP_URL """
         try:
             log.info("##### Property for OXP_URL #####")
-            self.load_storehouse()
             return StoreHouse.get_data()["oxp_url"]
         except Exception as err:  # pylint: disable=W0703
             log.info(err)
@@ -70,15 +69,14 @@ class Main(KytosNApp):
     def oxp_url(self, oxp_url):
         """ Setter for OXP_URL """
         log.info("##### Setter for OXP_URL #####")
-        log.info(self.load_storehouse())
         StoreHouse.save_oxp_url(oxp_url)
+        self.load_topology()
 
     @property
     def oxp_name(self):
         """ Property for OXP_NAME """
         try:
             log.info("##### Property for OXP_NAME #####")
-            self.load_storehouse()
             return StoreHouse.get_data()["oxp_name"]
         except Exception as err:  # pylint: disable=W0703
             log.info(err)
@@ -88,22 +86,8 @@ class Main(KytosNApp):
     def oxp_name(self, oxp_name):
         """ Setter for OXP_NAME """
         log.info("##### Setter for OXP_NAME #####")
-        log.info(self.load_storehouse())
         StoreHouse.save_oxp_name(oxp_name)
-
-    @listen_to("kytos/storehouse.loaded")
-    def load_storehouse(self, event=None):  # pylint: disable=W0613
-        """Function meant for validation, to make sure that the storehouse
-        napp has been loaded before all the other functions that use it begins
-        to call it."""
-        log.info("##### Loading Storehouse #####")
-        log.info("self.storehouse:%s", StoreHouse(self.controller))
-        log.info("__dict__:%s", StoreHouse.__dict__)
-        log.info("##### Loading Storehouse 2 #####")
-        if StoreHouse is not None:
-            log.info("##### load storehouse get data oxp_name #####")
-            log.info(StoreHouse.get_data()["oxp_name"])
-        log.info("##### Loading Storehouse 3 #####")
+        self.load_topology()
 
     @listen_to("kytos/topology.*")
     def load_topology(self, event=None):  # pylint: disable=W0613
