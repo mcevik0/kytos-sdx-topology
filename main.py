@@ -220,6 +220,7 @@ class Main(KytosNApp):
         kytos.storehouse.version within the storehouse and create a
         box object containing the version data that will be updated
         every time a change is detected in the topology."""
+        log.info("############# create_update_topology ##############")
         parse_args = {
             "topology": self.get_kytos_topology(),
             "version": self.storehouse.get_data()["version"],
@@ -227,10 +228,11 @@ class Main(KytosNApp):
             "oxp_name": self.oxp_name,
             "oxp_url": self.oxp_url
         }
+        log.info(parse_args)
         if parse_args["topology"] is not None and parse_args["version"] \
                 is not None and parse_args["model_version"] is not None and \
                 parse_args["oxp_name"] is not None and parse_args["oxp_url"] \
                 is not None:
             self.storehouse.update_box()
-            return ParseTopology(parse_args).get_sdx_topology()
+            return ParseTopology().get_sdx_topology(parse_args)
         return {}

@@ -11,12 +11,12 @@ import secrets
 class ParseTopology:
     """Parse Topology  class of kytos/sdx_topology NApp."""
 
-    def __init__(self, parse_args):
-        self.kytos_topology = parse_args["topology"]
-        self.version = parse_args["version"]
-        self.model_version = parse_args["model_version"]
-        self.oxp_name = parse_args["oxp_name"]
-        self.oxp_url = parse_args["oxp_url"]
+    def __init__(self):
+        self.kytos_topology = None
+        self.version = None
+        self.model_version = None
+        self.oxp_name = None
+        self.oxp_url = None
         self.valid_sdx = None
 
     def get_kytos_nodes(self):
@@ -332,8 +332,13 @@ class ParseTopology:
                         del sdx_link
         return sdx_links
 
-    def get_sdx_topology(self):
+    def get_sdx_topology(self, parse_args):
         """ function get_sdx_topology """
+        self.kytos_topology = parse_args["topology"]
+        self.version = parse_args["version"]
+        self.model_version = parse_args["model_version"]
+        self.oxp_name = parse_args["oxp_name"]
+        self.oxp_url = parse_args["oxp_url"]
         topology = {}
         topology["name"] = self.oxp_name
         topology["id"] = f"urn:sdx:topology:{self.oxp_url}"
