@@ -35,9 +35,12 @@ class StoreHouse:
 
     def get_data(self):
         """Return the box data."""
-        if not self.box:
+        log.info("############ get data #############")
+        try:
+            self.get_stored_box(self.box.box_id)
+        except Exception as err:  # pylint: disable=W0703
+            log.info(err)
             return {}
-        self.get_stored_box(self.box.box_id)
         return self.box.data
 
     def create_box(self):

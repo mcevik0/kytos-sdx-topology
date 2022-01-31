@@ -60,16 +60,38 @@ class Main(KytosNApp):
         """ Property for OXP_URL """
         try:
             log.info("##### Property for OXP_URL #####")
-            return StoreHouse.get_data()["oxp_url"]
+            data = StoreHouse.get_data()
         except Exception as err:  # pylint: disable=W0703
             log.info(err)
             return ""
+        if data["oxp_url"]:
+            return data["oxp_url"]
+        return ""
 
     @oxp_url.setter
     def oxp_url(self, oxp_url):
         """ Setter for OXP_URL """
         log.info("##### Setter for OXP_URL #####")
         StoreHouse.save_oxp_url(oxp_url)
+        self.load_topology()
+
+    @property
+    def oxp_name(self):
+        """ Property for OXP_NAME """
+        try:
+            log.info("##### Property for OXP_NAME #####")
+            data = StoreHouse.get_data()
+        except Exception as err:  # pylint: disable=W0703
+            log.info(err)
+            return ""
+        if data["oxp_name"]:
+            return data["oxp_name"]
+        return ""
+
+    @oxp_name.setter
+    def oxp_name(self, oxp_name):
+        """ Property for OXP_URL """
+        StoreHouse.save_oxp_name(oxp_name)
         self.load_topology()
 
     @listen_to("kytos/topology.*")
@@ -131,25 +153,23 @@ class Main(KytosNApp):
     @rest("v1/oxp_name", methods=["GET"])
     def get_oxp_name(self):
         """ REST endpoint to RETRIEVE the SDX napp domain_name"""
-        return jsonify(StoreHouse.get_data()["oxp_name"]), 200
+        return jsonify(self.oxp_name), 200
 
     @rest("v1/oxp_name", methods=["POST"])
     def set_oxp_name(self):
         """REST endpoint to provide the SDX napp with the domain_name provided
         by the operator"""
-        if self.topology_loaded or self.test_kytos_topology():
-            try:
-                oxp_name = request.get_json()
+        try:
+            oxp_name = request.get_json()
 
-            except BadRequest:
-                result = "The request body is not a well-formed JSON."
-                log.info("oxp_name result %s %s", result, 400)
-                raise BadRequest(result) from BadRequest
+        except BadRequest:
+            result = "The request body is not a well-formed JSON."
+            log.info("oxp_name result %s %s", result, 400)
+            raise BadRequest(result) from BadRequest
 
         if not isinstance(oxp_name, str):
             return jsonify("Incorrect Type submitted"), 401
-
-        StoreHouse.save_oxp_name(request.get_json())
+        self.oxp_name = oxp_name
         return jsonify(oxp_name), 200
 
     @rest("v1/validate", methods=["POST"])
