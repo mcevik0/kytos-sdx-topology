@@ -98,8 +98,9 @@ def test_node_additional_properties(json_data):
             url=json_data["url"], data=json.dumps(json_data["payload"]),
             headers=json_data["headers"])
     assert response.status_code == 400
-    assert "Additional properties are not allowed \
-            ('active_node' was unexpected)" in response.json()["error_message"]
+    message = "Additional properties are not allowed "
+    message += "('active_node' was unexpected)"
+    assert message in response.json()["error_message"]
 
 
 def test_node_id_pattern(json_data):
@@ -152,9 +153,9 @@ def test_node_port_additional_properties(json_data):
             url=json_data["url"], data=json.dumps(json_data["payload"]),
             headers=json_data["headers"])
     assert response.status_code == 400
-    assert "Additional properties are not allowed \
-            ('active_node_port' was unexpected)" \
-            in response.json()["error_message"]
+    message = "Additional properties are not allowed "
+    message += "('active_node_port' was unexpected)"
+    assert message in response.json()["error_message"]
 
 
 def test_node_port_id_pattern(json_data):
@@ -243,8 +244,9 @@ def test_link_additional_properties(json_data):
             url=json_data["url"], data=json.dumps(json_data["payload"]),
             headers=json_data["headers"])
     assert response.status_code == 400
-    assert "Additional properties are not allowed \
-            ('active_link' was unexpected)" in response.json()["error_message"]
+    message = "Additional properties are not allowed "
+    message += "('active_link' was unexpected)"
+    assert message in response.json()["error_message"]
 
 
 def test_link_id_pattern(json_data):

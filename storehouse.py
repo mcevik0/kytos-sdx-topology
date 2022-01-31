@@ -23,7 +23,6 @@ class StoreHouse:
 
     def __init__(self, controller):
         """Create a storehouse instance."""
-        log.info("##### Create a storehouse instance.#####")
         self.controller = controller
         self.namespace = 'kytos.sdx.storehouse.version'
         self._lock = threading.Lock()
@@ -35,7 +34,6 @@ class StoreHouse:
 
     def get_data(self):
         """Return the box data."""
-        log.info("############ get data #############")
         try:
             self.get_stored_box(self.box.box_id)
         except Exception as err:  # pylint: disable=W0703

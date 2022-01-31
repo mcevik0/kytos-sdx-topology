@@ -59,7 +59,6 @@ class Main(KytosNApp):
     def oxp_url(self):
         """ Property for OXP_URL """
         try:
-            log.info("##### Property for OXP_URL #####")
             self.load_storehouse()
             data = self.storehouse.get_data()
         except Exception as err:  # pylint: disable=W0703
@@ -72,14 +71,12 @@ class Main(KytosNApp):
     @oxp_url.setter
     def oxp_url(self, oxp_url):
         """ Setter for OXP_URL """
-        log.info("##### Setter for OXP_URL #####")
         self.storehouse.save_oxp_url(oxp_url)
 
     @property
     def oxp_name(self):
         """ Property for OXP_NAME """
         try:
-            log.info("##### Property for OXP_NAME #####")
             data = self.storehouse.get_data()
         except Exception as err:  # pylint: disable=W0703
             log.info(err)
@@ -134,7 +131,7 @@ class Main(KytosNApp):
     @staticmethod
     def get_kytos_topology():
         """retrieve topology from API"""
-        kytos_topology = requests.get(settings.topology_url).json()
+        kytos_topology = requests.get(settings.KYTOS_TOPOLOGY_URL).json()
         return kytos_topology["topology"]
 
     @rest("v1/oxp_url", methods=["GET"])
@@ -229,7 +226,7 @@ class Main(KytosNApp):
                     "links": topology_update["links"],
                 }
                 validate_topology = requests.post(
-                    settings.validate_topology, json=topology_dict
+                    settings.VALIDATE_TOPOLOGY, json=topology_dict
                 )
                 if validate_topology.status_code == 200:
                     return jsonify(topology_update), 200

@@ -1,5 +1,5 @@
 {
-  "url": "http://0.0.0.0:8000/v1/validate",
+  "url": "http://0.0.0.0:8181/api/kytos/sdx_topology/v1/validate",
   "headers": {
     "Content-type": "application/json"
   },
