@@ -10,8 +10,7 @@ from werkzeug.exceptions import BadRequest, UnsupportedMediaType
 from kytos.core import KytosNApp, log, rest
 from kytos.core.helpers import listen_to
 
-from napps.kytos.sdx_topology.storehouse import StoreHouse  \
-        # pylint: disable=E0401
+from napps.kytos.sdx_topology import storehouse  # pylint: disable=E0401
 from napps.kytos.sdx_topology import settings  # pylint: disable=E0401
 from napps.kytos.sdx_topology.topology_class import (ParseTopology) \
         # pylint: disable=E0401
@@ -38,6 +37,7 @@ class Main(KytosNApp):
         So, if you have any setup routine, insert it here.
         """
         self.topology_loaded = False
+        self.storehouse = None
 
     def execute(self):
         """Run after the setup method execution.
@@ -47,7 +47,7 @@ class Main(KytosNApp):
 
             self.execute_as_loop(30)  # 30-second interval.
         """
-        self.load_topology()
+        self.load_storehouse()
 
     def shutdown(self):
         """Run when your NApp is unloaded.
@@ -60,11 +60,12 @@ class Main(KytosNApp):
         """ Property for OXP_URL """
         try:
             log.info("##### Property for OXP_URL #####")
-            data = StoreHouse.get_data()
+            self.load_storehouse()
+            data = self.storehouse.get_data()
         except Exception as err:  # pylint: disable=W0703
             log.info(err)
             return ""
-        if data["oxp_url"]:
+        if "oxp_url" in data:
             return data["oxp_url"]
         return ""
 
@@ -72,27 +73,34 @@ class Main(KytosNApp):
     def oxp_url(self, oxp_url):
         """ Setter for OXP_URL """
         log.info("##### Setter for OXP_URL #####")
-        StoreHouse.save_oxp_url(oxp_url)
-        self.load_topology()
+        self.storehouse.save_oxp_url(oxp_url)
 
     @property
     def oxp_name(self):
         """ Property for OXP_NAME """
         try:
             log.info("##### Property for OXP_NAME #####")
-            data = StoreHouse.get_data()
+            data = self.storehouse.get_data()
         except Exception as err:  # pylint: disable=W0703
             log.info(err)
             return ""
-        if data["oxp_name"]:
+        if "oxp_name" in data:
             return data["oxp_name"]
         return ""
 
     @oxp_name.setter
     def oxp_name(self, oxp_name):
         """ Property for OXP_URL """
-        StoreHouse.save_oxp_name(oxp_name)
-        self.load_topology()
+        self.storehouse.save_oxp_name(oxp_name)
+
+    @listen_to('kytos/storehouse.loaded')
+    def load_storehouse(self, event=None):  # pylint: disable=W0613
+        """Function meant for validation, to make sure that the storehouse napp
+        has been loaded before all the other functions that use it begins to
+        call it."""
+        log.info("Loading Storehouse")
+        self.storehouse = storehouse.StoreHouse(self.controller)  \
+            # pylint: disable=W0201
 
     @listen_to("kytos/topology.*")
     def load_topology(self, event=None):  # pylint: disable=W0613
@@ -100,8 +108,8 @@ class Main(KytosNApp):
         napp has been loaded before all the other functions that use it begins
         to call it."""
         if not self.topology_loaded:
-            if StoreHouse is not None:
-                if StoreHouse.box is not None:
+            if self.storehouse:
+                if self.storehouse.box is not None:
                     self.create_update_topology()
                     self.topology_loaded = True  # pylint: disable=W0201
             else:
@@ -175,7 +183,6 @@ class Main(KytosNApp):
     @rest("v1/validate", methods=["POST"])
     def get_validate(self):
         """ REST to validate the topology following the SDX data model"""
-        log.debug("########### validating topology  #####################")
         if self.topology_loaded or self.test_kytos_topology():
             try:
                 data = request.json
@@ -241,9 +248,8 @@ class Main(KytosNApp):
         kytos.storehouse.version within the storehouse and create a
         box object containing the version data that will be updated
         every time a change is detected in the topology."""
-        log.info("##### create_update_topology ######")
-        StoreHouse.update_box()
-        version = StoreHouse.get_data()["version"]
+        self.storehouse.update_box()
+        version = self.storehouse.get_data()["version"]
         return ParseTopology(
             topology=self.get_kytos_topology(),
             version=version,
