@@ -11,7 +11,6 @@ def test_kytos_topology(api_data):
     """ test a GET request to SDX validate"""
     response = requests.get(
             url=KYTOS_TOPOLOGY_URL, headers=api_data["headers"])
-    print(response.json())
     assert response.status_code == 200
     assert "topology" in response.json()
 
@@ -26,6 +25,7 @@ def test_oxp_url(api_data):
     response = requests.get(
             url=api_data["url"]+"oxp_url", headers=api_data["headers"])
     assert response.status_code == 200
+    assert isinstance(response.json(), str)
     assert "amlight.net" in response.json()
 
 
@@ -49,3 +49,11 @@ def test_validate(valid_data):
             url=valid_data["url"], data=json.dumps(valid_data["payload"]),
             headers=valid_data["headers"])
     assert response.status_code == 200
+
+
+def test_sdx_topology(api_data):
+    """ test the SDX topology get request """
+    response = requests.get(
+            url=api_data["url"]+"topology", headers=api_data["headers"])
+    assert response.status_code == 200
+    assert "id" in response.json()
