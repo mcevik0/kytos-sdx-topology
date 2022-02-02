@@ -148,3 +148,12 @@ bandit --configfile bandit.yaml
 
 assert_used:
   skips: ['*_test.py', 'test_*.py']
+
+
+# How to update dependencies versions
+
+// Edit requirements.in/dev.txt if needed.
+
+// Run pip-compile again, exactly as before:
+
+$ <venv>/bin/pip-compile dev.in
