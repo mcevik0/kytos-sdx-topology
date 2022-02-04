@@ -2,6 +2,7 @@
 SDX Topology API test
 """
 import json
+# from urllib.parse import quote
 import requests
 
 KYTOS_TOPOLOGY_URL = "http://localhost:8181/api/kytos/topology/v3/"
@@ -55,15 +56,14 @@ def test_sdx_topology_id(api_data):
 def test_sdx_topology_link(api_data):
     """ test the SDX topology link get request end_to_end_test_1_5 """
     response = requests.get(
-            url=api_data["url"]+"topology", headers=api_data["headers"])
+            url=KYTOS_TOPOLOGY_URL, headers=api_data["headers"])
     assert response.status_code == 200
     assert isinstance(response.json(), dict)
-    assert "links" in response.json()
-    link_id = response.json()["links"][0]["id"]
-    url = KYTOS_TOPOLOGY_URL+"links/"+link_id+"/enable"
-    print(url)
+    assert "links" in response.json()['topology']
+    link_id = next(iter(response.json()['topology']['links']))
+    url = f'{KYTOS_TOPOLOGY_URL}links/{link_id}/enable'
     response = requests.post(url=url, headers=api_data["headers"])
-    assert response.status_code == 200
+    assert response.status_code == 201
 
 
 def test_validate(valid_data):
