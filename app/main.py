@@ -4,22 +4,20 @@ Main module of amlight/sdx Kytos Network Application.
 SDX API
 """
 
+import pandas as pd
 import requests
 from flask import jsonify, request
 from werkzeug.exceptions import BadRequest, UnsupportedMediaType
+
 from kytos.core import KytosNApp, log, rest
 from kytos.core.helpers import listen_to
-
-from napps.kytos.sdx_topology import storehouse  # pylint: disable=E0401
 from napps.kytos.sdx_topology import settings  # pylint: disable=E0401
+from napps.kytos.sdx_topology import storehouse  # pylint: disable=E0401
 from napps.kytos.sdx_topology.topology_class import (ParseTopology) \
         # pylint: disable=E0401
+from napps.kytos.sdx_topology import utils  # pylint: disable=E0401
 
-from napps.kytos.sdx_topology.utils import (load_spec, validate_request)  \
-        # pylint: disable=E0401
-
-
-spec = load_spec()
+spec = utils.load_spec()
 
 
 class Main(KytosNApp):
@@ -38,6 +36,7 @@ class Main(KytosNApp):
         """
         self.topology_loaded = False
         self.storehouse = None
+        self.initial_kytos_topolgy = None
 
     def execute(self):
         """Run after the setup method execution.
@@ -90,6 +89,11 @@ class Main(KytosNApp):
         """ Property for OXP_URL """
         self.storehouse.save_oxp_name(oxp_name)
 
+    @property
+    def current_kytos_topology(self):
+        """ Property for Topology """
+        return self.get_kytos_topology
+
     @listen_to('kytos/storehouse.loaded')
     def load_storehouse(self, event=None):  # pylint: disable=W0613
         """Function meant for validation, to make sure that the storehouse napp
@@ -98,12 +102,16 @@ class Main(KytosNApp):
         log.info("Loading Storehouse")
         self.storehouse = storehouse.StoreHouse(self.controller)  \
             # pylint: disable=W0201
+        self.initial_kytos_topology = self.current_kytos_topology \
+            # pylint: disable=W0201
 
     @listen_to("kytos/topology.*")
     def load_topology(self, event=None):  # pylint: disable=W0613
         """Function meant for validation, to make sure that the storehouse
         napp has been loaded before all the other functions that use it begins
         to call it."""
+        log.info("########## Event##########")
+        log.info(event)
         if not self.topology_loaded:
             if self.storehouse:
                 if self.storehouse.box is not None:
@@ -191,7 +199,7 @@ class Main(KytosNApp):
                 result = "The request body mimetype is not application/json."
                 log.info("update result %s %s", result, 415)
                 raise UnsupportedMediaType(result)
-            response = validate_request(spec, request)
+            response = utils.validate_request(spec, request)
             return jsonify(response["data"]), response["code"]
         # debug only
         log.info(self.topology_loaded)
@@ -239,6 +247,21 @@ class Main(KytosNApp):
         log.info(self.topology_loaded)
         log.info(self.test_kytos_topology())
         return jsonify("Topology napp has not loaded"), 401
+
+    @rest("v1/eval_kytos_topology", methods=["POST"])
+    def get_df_diff(self):
+        """ REST to return the kytos topology with pandas df """
+        eval_param = request.get_json()
+        current_params = self.current_kytos_topology()[eval_param]
+        initial_params = self.initial_kytos_topology()[eval_param]
+        params_diff = {}
+        if current_params and initial_params:
+            current_dict = [v for (k, v) in current_params.items()]
+            current_df = pd.json_normalize(current_dict)
+            initial_dict = [v for (k, v) in initial_params.items()]
+            initial_df = pd.json_normalize(initial_dict)
+            params_diff = utils.diff_pd(current_df, initial_df)
+        return jsonify(params_diff), 200
 
     def create_update_topology(self):
         """Function that will take care of initializing the namespace

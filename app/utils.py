@@ -1,12 +1,17 @@
 """Utility functions."""
 from pathlib import Path
-
 from openapi_core import create_spec
 from openapi_core.contrib.flask import FlaskOpenAPIRequest
 from openapi_core.validation.request.validators import RequestValidator
 from openapi_spec_validator import validate_spec
 from openapi_spec_validator.readers import read_from_filename
+import pandas as pd
+import numpy as np
 from kytos.core.events import KytosEvent
+
+pd.set_option('display.max_rows', 500)
+pd.set_option('display.max_columns', 500)
+pd.set_option('display.width', 1000)
 
 
 def emit_event(controller, name, **kwargs):
@@ -23,6 +28,28 @@ def compare_endpoint_trace(endpoint, vlan, trace):
         and endpoint.port_number == trace["port"]
         and vlan == trace["vlan"]
     )
+
+
+def diff_pd(df1, df2):
+    """Identify differences between two pandas DataFrames"""
+    assert (df1.columns == df2.columns).all(), \
+        "DataFrame column names are different"
+    if any(df1.dtypes != df2.dtypes):
+        # Data Types are different, trying to convert
+        df2 = df2.astype(df1.dtypes)
+    if df1.equals(df2):
+        return None
+    # need to account for np.nan != np.nan returning True
+    diff_mask = (df1 != df2) & ~(df1.isnull() & df2.isnull())
+    ne_stacked = diff_mask.stack()
+    changed = ne_stacked[ne_stacked]
+    changed.index.names = ['id', 'col']
+    difference_locations = np.where(diff_mask)
+    changed_from = df1.values[difference_locations]
+    changed_to = df2.values[difference_locations]
+    # pd_result = pd.DataFrame({'from': changed_from, 'to': changed_to},
+    #                       index=changed.index)
+    return {'index': changed.index, 'from': changed_from, 'to': changed_to}
 
 
 def load_spec():
