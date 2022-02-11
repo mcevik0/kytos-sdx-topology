@@ -69,7 +69,7 @@ def test_kytos_topology_link(api_data):
     assert isinstance(response.json(), dict)
     assert "links" in response.json()['topology']
     link_id = next(iter(response.json()['topology']['links']))
-    url = f'{KYTOS_TOPOLOGY_URL}links/{link_id}/enable'
+    url = f'{KYTOS_TOPOLOGY_URL}links/{link_id}/disable'
     response = requests.post(url=url, headers=api_data["headers"])
     assert response.status_code == 201
 

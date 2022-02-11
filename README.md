@@ -157,3 +157,7 @@ assert_used:
 // Run pip-compile again, exactly as before:
 
 $ <venv>/bin/pip-compile dev.in
+
+# Pytest
+
+python3 -m pytest --cov=app
