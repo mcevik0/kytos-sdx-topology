@@ -3,19 +3,20 @@ Main class of kytos/sdx_topology Kytos Network Application.
 
 SDX API
 """
-import datetime
 import secrets
+from napps.kytos.sdx_topology import utils   # pylint: disable=E0401
 
 
 class ParseTopology:
     """Parse Topology  class of kytos/sdx_topology NApp."""
 
-    def __init__(self, topology, version, model_version, oxp_name, oxp_url):
-        self.kytos_topology = topology
-        self.version = version
-        self.model_version = model_version
-        self.oxp_name = oxp_name
-        self.oxp_url = oxp_url
+    def __init__(self, **args):
+        self.kytos_topology = args['topology']
+        self.version = args['version']
+        self.timestamp = args['timestamp']
+        self.model_version = args['model_version']
+        self.oxp_name = args['oxp_name']
+        self.oxp_url = args['oxp_url']
 
     def get_kytos_nodes(self):
         """ return parse_args["topology"]["switches"] values """
@@ -24,11 +25,6 @@ class ParseTopology:
     def get_kytos_links(self):
         """ return parse_args["topology"]["links"] values """
         return self.kytos_topology["links"].values()
-
-    @staticmethod
-    def get_timestamp():
-        """Function to obtain the current time_stamp in a specific format"""
-        return datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
     @staticmethod
     def get_link_port_speed(speed):
@@ -323,7 +319,7 @@ class ParseTopology:
         topology["name"] = self.oxp_name
         topology["id"] = f"urn:sdx:topology:{self.oxp_url}"
         topology["version"] = self.version
-        topology["timestamp"] = self.get_timestamp()
+        topology["timestamp"] = utils.get_timestamp()
         topology["model_version"] = self.model_version
         topology["nodes"] = self.get_sdx_nodes()
         topology["links"] = self.get_sdx_links()

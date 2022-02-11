@@ -113,8 +113,15 @@ class Main(KytosNApp):
         admin_events = [
                 "kytos/topology.switch.enabled",
                 "kytos/topology.switch.disabled"]
+        operational_events = [
+                "kytos/topology.link.up",
+                "kytos/topology.link.down"]
         if event.name in admin_events:
             log.info("########## admin Event##########")
+            log.info(event.name)
+            log.info(event.timestamp)
+        elif event.name in operational_events:
+            log.info("########## operational Event##########")
             log.info(event.name)
             log.info(event.timestamp)
 
@@ -276,9 +283,11 @@ class Main(KytosNApp):
         every time a change is detected in the topology."""
         self.storehouse.update_box()
         version = self.storehouse.get_data()["version"]
+        timestamp = self.storehouse.get_data()["timestamp"]
         return ParseTopology(
             topology=self.get_kytos_topology(),
             version=version,
+            timestamp=timestamp,
             model_version="1.0.0",
             oxp_name=self.oxp_name,
             oxp_url=self.oxp_url,

@@ -1,5 +1,6 @@
 """Utility functions."""
 from pathlib import Path
+import datetime
 from openapi_core import create_spec
 from openapi_core.contrib.flask import FlaskOpenAPIRequest
 from openapi_core.validation.request.validators import RequestValidator
@@ -13,6 +14,11 @@ from kytos.core.events import KytosEvent
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
+
+
+def get_timestamp():
+    """Function to obtain the current time_stamp in a specific format"""
+    return datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def emit_event(controller, name, **kwargs):
