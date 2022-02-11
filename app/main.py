@@ -110,8 +110,14 @@ class Main(KytosNApp):
         """Function meant for validation, to make sure that the storehouse
         napp has been loaded before all the other functions that use it begins
         to call it."""
-        log.info("########## Event##########")
-        log.info(event)
+        admin_events = [
+                "kytos/topology.switch.enabled",
+                "kytos/topology.switch.disabled"]
+        if event.name in admin_events:
+            log.info("########## admin Event##########")
+            log.info(event.name)
+            log.info(event.timestamp)
+
         if not self.topology_loaded:
             if self.storehouse:
                 if self.storehouse.box is not None:

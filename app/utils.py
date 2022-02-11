@@ -7,6 +7,7 @@ from openapi_spec_validator import validate_spec
 from openapi_spec_validator.readers import read_from_filename
 import pandas as pd
 import numpy as np
+from kytos.core import log
 from kytos.core.events import KytosEvent
 
 pd.set_option('display.max_rows', 500)
@@ -32,21 +33,33 @@ def compare_endpoint_trace(endpoint, vlan, trace):
 
 def diff_pd(df1, df2):
     """Identify differences between two pandas DataFrames"""
+    log.info("############### diff_pd ###############")
+    log.info("##### df1 #####")
+    log.info(df1)
+    log.info("##### df2 #####")
+    log.info(df2)
     assert (df1.columns == df2.columns).all(), \
         "DataFrame column names are different"
     if any(df1.dtypes != df2.dtypes):
         # Data Types are different, trying to convert
         df2 = df2.astype(df1.dtypes)
     if df1.equals(df2):
-        return None
+        return {"message:": "No changes"}
     # need to account for np.nan != np.nan returning True
     diff_mask = (df1 != df2) & ~(df1.isnull() & df2.isnull())
     ne_stacked = diff_mask.stack()
     changed = ne_stacked[ne_stacked]
+    log.info("#################### changed ####################")
+    log.info(changed)
     changed.index.names = ['id', 'col']
     difference_locations = np.where(diff_mask)
     changed_from = df1.values[difference_locations]
+    log.info("#################### changed from  ####################")
+    log.info(changed_from)
     changed_to = df2.values[difference_locations]
+    log.info("#################### changed to  ####################")
+    log.info(changed_to)
+    log.info("############### end of diff_pd ###############")
     # pd_result = pd.DataFrame({'from': changed_from, 'to': changed_to},
     #                       index=changed.index)
     return {'index': changed.index, 'from': changed_from, 'to': changed_to}
