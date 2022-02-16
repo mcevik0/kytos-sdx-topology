@@ -33,7 +33,7 @@ class StoreHouse:
             self.box = None
         self.list_stored_boxes()
         self.counter = 0
-        self.timestamp = utils.get_timestamp()
+        self.time_stamp = utils.get_timestamp()
 
     def get_data(self):
         """Return the box data."""
@@ -50,7 +50,7 @@ class StoreHouse:
         content = {'namespace': 'kytos.sdx.storehouse.version',
                    'callback': self._create_box_callback,
                    'data': {"version": self.counter,
-                            "timestamp": self.timestamp,
+                            "time_stamp": self.time_stamp,
                             "oxp_name": "",
                             "oxp_url": ""
                             }
@@ -60,7 +60,7 @@ class StoreHouse:
 
         self.controller.buffers.app.put(event)
 
-        log.info('Create box from storehouse')
+        log.info('########### Create box from storehouse ##########')
 
     def _create_box_callback(self, _event, data, error):
         """Execute a callback to log the output of the create_box function."""
@@ -135,18 +135,19 @@ class StoreHouse:
         else:
             self.create_box()
 
-    def update_timestamp(self, timestamp):
+    def update_timestamp(self, time_stamp):
         """Update an existing box with a new timestamp value after a topology
         change is detected."""
         log.info("########## update_timestamp ##########")
-        log.info(self.timestamp)
+        log.info(self.time_stamp)
         log.info("########## timestamp ##########")
         self._lock.acquire()  # avoid race condition  # pylint: disable=R1732
         log.debug(f'Lock {self._lock} acquired.')
-        self.timestamp = timestamp
+        self.time_stamp = time_stamp
+        self.box.data["time_stamp"] = self.time_stamp
         content = {'namespace': self.namespace,
                    'box_id': self.box.box_id,
-                   'data': {"timestamp": self.timestamp},
+                   'data': {"time_stamp": self.time_stamp},
                    'callback': self._update_box_callback}
 
         event = KytosEvent(name='kytos.storehouse.update', content=content)

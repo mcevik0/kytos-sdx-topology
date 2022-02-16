@@ -128,15 +128,18 @@ class Main(KytosNApp):
 
         log.info("########## calling create_update_topology #########")
         if self.storehouse:
-            log.info("self.storehouse")
+            log.info("########## self.storehouse ##########")
             log.info(self.storehouse)
-            log.info("###########################################")
             if self.storehouse.box is not None:
-                log.info("self.storehouse.box")
+                log.info("########## self.storehouse.box ##########")
                 log.info(self.storehouse.box)
-                log.info("###########################################")
                 self.create_update_topology(event_type, event.timestamp)
                 self.topology_loaded = True  # pylint: disable=W0201
+            else:
+                log.info("########## not self.storehouse.box ##########")
+        else:
+            log.info("########## not self.storehouse ##########")
+        log.info("###########################################")
 
     @listen_to("kytos/topology.unloaded")
     def unload_topology(self):  # pylint: disable=W0613
