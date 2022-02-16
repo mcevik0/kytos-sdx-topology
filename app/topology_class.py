@@ -4,7 +4,6 @@ Main class of kytos/sdx_topology Kytos Network Application.
 SDX API
 """
 import secrets
-from napps.kytos.sdx_topology import utils   # pylint: disable=E0401
 
 
 class ParseTopology:
@@ -319,7 +318,7 @@ class ParseTopology:
         topology["name"] = self.oxp_name
         topology["id"] = f"urn:sdx:topology:{self.oxp_url}"
         topology["version"] = self.version
-        topology["timestamp"] = utils.get_timestamp()
+        topology["timestamp"] = self.timestamp
         topology["model_version"] = self.model_version
         topology["nodes"] = self.get_sdx_nodes()
         topology["links"] = self.get_sdx_links()

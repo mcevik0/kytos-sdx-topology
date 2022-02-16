@@ -4,7 +4,6 @@ Main module of amlight/sdx Kytos Network Application.
 SDX API
 """
 
-import pandas as pd
 import requests
 from flask import jsonify, request
 from werkzeug.exceptions import BadRequest, UnsupportedMediaType
@@ -36,7 +35,6 @@ class Main(KytosNApp):
         """
         self.topology_loaded = False
         self.storehouse = None
-        self.initial_kytos_topolgy = None
 
     def execute(self):
         """Run after the setup method execution.
@@ -47,6 +45,8 @@ class Main(KytosNApp):
             self.execute_as_loop(30)  # 30-second interval.
         """
         self.load_storehouse()
+        self.initial_kytos_topology = self.current_kytos_topology \
+            # pylint: disable=W0201
 
     def shutdown(self):
         """Run when your NApp is unloaded.
@@ -58,10 +58,8 @@ class Main(KytosNApp):
     def oxp_url(self):
         """ Property for OXP_URL """
         try:
-            self.load_storehouse()
             data = self.storehouse.get_data()
-        except Exception as err:  # pylint: disable=W0703
-            log.info(err)
+        except Exception:  # pylint: disable=W0703
             return ""
         if "oxp_url" in data:
             return data["oxp_url"]
@@ -77,8 +75,7 @@ class Main(KytosNApp):
         """ Property for OXP_NAME """
         try:
             data = self.storehouse.get_data()
-        except Exception as err:  # pylint: disable=W0703
-            log.info(err)
+        except Exception:  # pylint: disable=W0703
             return ""
         if "oxp_name" in data:
             return data["oxp_name"]
@@ -92,6 +89,7 @@ class Main(KytosNApp):
     @property
     def current_kytos_topology(self):
         """ Property for Topology """
+        log.info("########## current_kytos_topology ##########")
         return self.get_kytos_topology
 
     @listen_to('kytos/storehouse.loaded')
@@ -99,17 +97,19 @@ class Main(KytosNApp):
         """Function meant for validation, to make sure that the storehouse napp
         has been loaded before all the other functions that use it begins to
         call it."""
-        log.info("Loading Storehouse")
-        self.storehouse = storehouse.StoreHouse(self.controller)  \
-            # pylint: disable=W0201
-        self.initial_kytos_topology = self.current_kytos_topology \
-            # pylint: disable=W0201
+        if not self.storehouse:
+            self.storehouse = storehouse.StoreHouse(self.controller)  \
+                    # pylint: disable=W0201
 
     @listen_to("kytos/topology.*")
     def load_topology(self, event=None):  # pylint: disable=W0613
         """Function meant for validation, to make sure that the storehouse
         napp has been loaded before all the other functions that use it begins
         to call it."""
+        log.info('############# @listen_to("kytos/topology.*") #############')
+        log.info(event.name)
+        log.info(event.timestamp)
+        event_type = 0
         admin_events = [
                 "kytos/topology.switch.enabled",
                 "kytos/topology.switch.disabled"]
@@ -118,19 +118,24 @@ class Main(KytosNApp):
                 "kytos/topology.link.down"]
         if event.name in admin_events:
             log.info("########## admin Event##########")
-            log.info(event.name)
-            log.info(event.timestamp)
+            event_type = 1
         elif event.name in operational_events:
             log.info("########## operational Event##########")
-            log.info(event.name)
-            log.info(event.timestamp)
+            event_type = 2
+        else:
+            log.info("########## None ##########")
+            return
 
-        if not self.topology_loaded:
-            if self.storehouse:
-                if self.storehouse.box is not None:
-                    self.create_update_topology()
-                    self.topology_loaded = True  # pylint: disable=W0201
-            else:
+        log.info("########## calling create_update_topology #########")
+        if self.storehouse:
+            log.info("self.storehouse")
+            log.info(self.storehouse)
+            log.info("###########################################")
+            if self.storehouse.box is not None:
+                log.info("self.storehouse.box")
+                log.info(self.storehouse.box)
+                log.info("###########################################")
+                self.create_update_topology(event_type, event.timestamp)
                 self.topology_loaded = True  # pylint: disable=W0201
 
     @listen_to("kytos/topology.unloaded")
@@ -138,6 +143,7 @@ class Main(KytosNApp):
         """Function meant for validation, to make sure that the storehouse napp
         has been loaded before all the other functions that use it begins to
         call it."""
+        log.info('######## @listen_to("kytos/topology.unloaded") ########')
         self.topology_loaded = False  # pylint: disable=W0201
 
     def test_kytos_topology(self):
@@ -269,19 +275,18 @@ class Main(KytosNApp):
         initial_params = self.initial_kytos_topology()[eval_param]
         params_diff = {}
         if current_params and initial_params:
-            current_dict = [v for (k, v) in current_params.items()]
-            current_df = pd.json_normalize(current_dict)
-            initial_dict = [v for (k, v) in initial_params.items()]
-            initial_df = pd.json_normalize(initial_dict)
-            params_diff = utils.diff_pd(current_df, initial_df)
+            params_diff = utils.diff_pd(current_params, initial_params)
         return jsonify(params_diff), 200
 
-    def create_update_topology(self):
+    def create_update_topology(self, event_type=0, event_timestamp=None):
         """Function that will take care of initializing the namespace
         kytos.storehouse.version within the storehouse and create a
         box object containing the version data that will be updated
         every time a change is detected in the topology."""
-        self.storehouse.update_box()
+        if event_type == 1:
+            self.storehouse.update_box()
+        elif event_type == 2:
+            self.storehouse.update_timestamp(event_timestamp)
         version = self.storehouse.get_data()["version"]
         timestamp = self.storehouse.get_data()["timestamp"]
         return ParseTopology(

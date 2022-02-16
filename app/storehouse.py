@@ -5,6 +5,7 @@ Module to handle the storehouse.
 import threading
 from kytos.core import log
 from kytos.core.events import KytosEvent
+from napps.kytos.sdx_topology import utils  # pylint: disable=E0401
 
 
 class StoreHouse:
@@ -23,6 +24,7 @@ class StoreHouse:
 
     def __init__(self, controller):
         """Create a storehouse instance."""
+        log.info("########## StoreHouse __init__ #########")
         self.controller = controller
         self.namespace = 'kytos.sdx.storehouse.version'
         self._lock = threading.Lock()
@@ -31,22 +33,24 @@ class StoreHouse:
             self.box = None
         self.list_stored_boxes()
         self.counter = 0
+        self.timestamp = utils.get_timestamp()
 
     def get_data(self):
         """Return the box data."""
         try:
             self.get_stored_box(self.box.box_id)
-        except Exception as err:  # pylint: disable=W0703
-            log.info(err)
+        except Exception:  # pylint: disable=W0703
             return {}
+        log.info("########## get_data ##########")
+        log.info(self.box.data)
         return self.box.data
 
     def create_box(self):
         """Create a new box with the napp version information"""
-
         content = {'namespace': 'kytos.sdx.storehouse.version',
                    'callback': self._create_box_callback,
                    'data': {"version": self.counter,
+                            "timestamp": self.timestamp,
                             "oxp_name": "",
                             "oxp_url": ""
                             }
@@ -69,6 +73,9 @@ class StoreHouse:
     def update_box(self):
         """Update an existing box with a new version value after a topology
         change is detected."""
+        log.info("########## update_box ##########")
+        log.info(self.counter)
+        log.info("########## counter ##########")
         self._lock.acquire()  # avoid race condition  # pylint: disable=R1732
         log.debug(f'Lock {self._lock} acquired.')
         self.counter += 1
@@ -128,6 +135,23 @@ class StoreHouse:
         else:
             self.create_box()
 
+    def update_timestamp(self, timestamp):
+        """Update an existing box with a new timestamp value after a topology
+        change is detected."""
+        log.info("########## update_timestamp ##########")
+        log.info(self.timestamp)
+        log.info("########## timestamp ##########")
+        self._lock.acquire()  # avoid race condition  # pylint: disable=R1732
+        log.debug(f'Lock {self._lock} acquired.')
+        self.timestamp = timestamp
+        content = {'namespace': self.namespace,
+                   'box_id': self.box.box_id,
+                   'data': {"timestamp": self.timestamp},
+                   'callback': self._update_box_callback}
+
+        event = KytosEvent(name='kytos.storehouse.update', content=content)
+        self.controller.buffers.app.put(event)
+
     def save_oxp_name(self, oxp_name):
         """Save the OXP NAME using the storehouse."""
         self._lock.acquire()  # avoid race condition  # pylint: disable=R1732
@@ -161,6 +185,6 @@ class StoreHouse:
         self._lock.release()
         log.debug(f'Lock {self._lock} released.')
         if error:
-            log.error(f'Can\'t update the {self.box.box_id}')
+            log.error("Can not update the self.box.box_id")
 
         log.debug(f'Box {data.box_id} was updated.')

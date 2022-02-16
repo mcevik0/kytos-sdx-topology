@@ -37,32 +37,38 @@ def compare_endpoint_trace(endpoint, vlan, trace):
     )
 
 
-def diff_pd(df1, df2):
+def diff_pd(current_params, initial_params):
     """Identify differences between two pandas DataFrames"""
     log.info("############### diff_pd ###############")
-    log.info("##### df1 #####")
-    log.info(df1)
-    log.info("##### df2 #####")
-    log.info(df2)
-    assert (df1.columns == df2.columns).all(), \
+    log.info("##### current_df #####")
+    log.info(current_params)
+    log.info("##### initial_df #####")
+    log.info(initial_params)
+    current_dict = [v for (k, v) in current_params.items()]
+    current_df = pd.json_normalize(current_dict)
+    initial_dict = [v for (k, v) in initial_params.items()]
+    initial_df = pd.json_normalize(initial_dict)
+
+    assert (current_df.columns == initial_df.columns).all(), \
         "DataFrame column names are different"
-    if any(df1.dtypes != df2.dtypes):
+    if any(current_df.dtypes != initial_df.dtypes):
         # Data Types are different, trying to convert
-        df2 = df2.astype(df1.dtypes)
-    if df1.equals(df2):
+        initial_df = initial_df.astype(current_df.dtypes)
+    if current_df.equals(initial_df):
         return {"message:": "No changes"}
     # need to account for np.nan != np.nan returning True
-    diff_mask = (df1 != df2) & ~(df1.isnull() & df2.isnull())
+    diff_mask = (current_df != initial_df) & \
+        ~(current_df.isnull() & initial_df.isnull())
     ne_stacked = diff_mask.stack()
     changed = ne_stacked[ne_stacked]
     log.info("#################### changed ####################")
     log.info(changed)
     changed.index.names = ['id', 'col']
     difference_locations = np.where(diff_mask)
-    changed_from = df1.values[difference_locations]
+    changed_from = current_df.values[difference_locations]
     log.info("#################### changed from  ####################")
     log.info(changed_from)
-    changed_to = df2.values[difference_locations]
+    changed_to = initial_df.values[difference_locations]
     log.info("#################### changed to  ####################")
     log.info(changed_to)
     log.info("############### end of diff_pd ###############")
