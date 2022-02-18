@@ -4,6 +4,14 @@ Fixtures for Topology validation test
 import os
 import json
 import pytest
+from kytos.core.events import KytosEvent
+
+
+@pytest.fixture
+def event():
+    '''Returns a KytosEvents instance'''
+    kevent = KytosEvent()
+    return kevent
 
 
 @pytest.fixture

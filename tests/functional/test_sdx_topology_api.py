@@ -2,7 +2,6 @@
 SDX Topology API test
 """
 import json
-# from urllib.parse import quote
 import requests
 
 KYTOS_TOPOLOGY_URL = "http://localhost:8181/api/kytos/topology/v3/"
