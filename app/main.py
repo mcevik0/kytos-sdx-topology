@@ -84,7 +84,6 @@ class Main(KytosNApp):
     @oxp_name.setter
     def oxp_name(self, oxp_name):
         """ Property for OXP_URL """
-        log.info(dir(self.storehouse))
         self.storehouse.save_oxp_name(oxp_name)
 
     @property
@@ -216,13 +215,16 @@ class Main(KytosNApp):
     @rest("v1/topology")
     def get_topology_version(self):
         """ REST to return the topology following the SDX data model"""
+        log.info("######### v1/topology ##########")
         if not self.oxp_url:
+            log.info("######### not self.oxp_url ##########")
             return (
                 jsonify("Submit oxp_url previous to request topology schema"),
                 401,
             )
 
         if not self.oxp_name:
+            log.info("######### not self.oxp_name ##########")
             return (
                 jsonify("Submit oxp_name previous to request topology schema"),
                 401,
@@ -230,7 +232,9 @@ class Main(KytosNApp):
 
         if self.topology_loaded or self.test_kytos_topology():
             try:
+                log.info("########## topology update ##########")
                 topology_update = self.create_update_topology()
+                log.info(topology_update)
                 topology_dict = {
                     "id": topology_update["id"],
                     "name": topology_update["name"],
@@ -271,12 +275,17 @@ class Main(KytosNApp):
         kytos.storehouse.version within the storehouse and create a
         box object containing the version data that will be updated
         every time a change is detected in the topology."""
+        log.info("########## create_update_topology ##########")
         if event_type == 1:
             self.storehouse.update_box()
         elif event_type == 2:
             self.storehouse.update_timestamp(event_timestamp)
+        log.info("########## version ##########")
         version = self.storehouse.get_data()["version"]
-        timestamp = self.storehouse.get_data()["timestamp"]
+        log.info("########## timestamp ##########")
+        timestamp = self.storehouse.get_data()["time_stamp"]
+        log.info("########## end timestamp ##########")
+        log.info(timestamp)
         return ParseTopology(
             topology=self.get_kytos_topology(),
             version=version,

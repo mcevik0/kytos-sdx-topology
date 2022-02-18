@@ -1,12 +1,13 @@
 """Utility functions."""
+from datetime import datetime
 from pathlib import Path
-import datetime
 from openapi_core import create_spec
 from openapi_core.contrib.flask import FlaskOpenAPIRequest
 from openapi_core.validation.request.validators import RequestValidator
 from openapi_spec_validator import validate_spec
 from openapi_spec_validator.readers import read_from_filename
 import pandas as pd
+import pytz
 import numpy as np
 # from kytos.core import log
 
@@ -20,7 +21,8 @@ def get_timestamp(timestamp=None):
     if timestamp is not None:
         if len(timestamp) >= 19:
             return timestamp[:10]+"T"+timestamp[11:19]+"Z"
-    return datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    return datetime.now(
+            pytz.timezone("America/New_York")).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def diff_pd(current_params, initial_params):
