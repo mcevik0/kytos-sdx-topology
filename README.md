@@ -161,3 +161,11 @@ $ <venv>/bin/pip-compile dev.in
 # Pytest
 
 python3 -m pytest --cov=app
+
+# Partial test
+
+pytest -v -k "test_sdx_topology"
+
+# Unit test
+
+pytest tests/unit/test_main.py

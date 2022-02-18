@@ -1,1 +1,1 @@
-"""Module for the NApp kytos/sdx_topology."""
+"""NApp responsible for sdx topology management."""
