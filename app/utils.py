@@ -8,42 +8,23 @@ from openapi_spec_validator import validate_spec
 from openapi_spec_validator.readers import read_from_filename
 import pandas as pd
 import numpy as np
-from kytos.core import log
-from kytos.core.events import KytosEvent
+# from kytos.core import log
 
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
 
-def get_timestamp():
+def get_timestamp(timestamp=None):
     """Function to obtain the current time_stamp in a specific format"""
+    if timestamp is not None:
+        if len(timestamp) >= 19:
+            return timestamp[:10]+"T"+timestamp[11:19]+"Z"
     return datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-
-
-def emit_event(controller, name, **kwargs):
-    """Send an event when something happens with an EVC."""
-    event_name = f"kytos/mef_eline.{name}"
-    event = KytosEvent(name=event_name, content=kwargs)
-    controller.buffers.app.put(event)
-
-
-def compare_endpoint_trace(endpoint, vlan, trace):
-    """Compare and endpoint with a trace step."""
-    return (
-        endpoint.switch.dpid == trace["dpid"]
-        and endpoint.port_number == trace["port"]
-        and vlan == trace["vlan"]
-    )
 
 
 def diff_pd(current_params, initial_params):
     """Identify differences between two pandas DataFrames"""
-    log.info("############### diff_pd ###############")
-    log.info("##### current_df #####")
-    log.info(current_params)
-    log.info("##### initial_df #####")
-    log.info(initial_params)
     current_dict = [v for (k, v) in current_params.items()]
     current_df = pd.json_normalize(current_dict)
     initial_dict = [v for (k, v) in initial_params.items()]
@@ -61,17 +42,10 @@ def diff_pd(current_params, initial_params):
         ~(current_df.isnull() & initial_df.isnull())
     ne_stacked = diff_mask.stack()
     changed = ne_stacked[ne_stacked]
-    log.info("#################### changed ####################")
-    log.info(changed)
     changed.index.names = ['id', 'col']
     difference_locations = np.where(diff_mask)
     changed_from = current_df.values[difference_locations]
-    log.info("#################### changed from  ####################")
-    log.info(changed_from)
     changed_to = initial_df.values[difference_locations]
-    log.info("#################### changed to  ####################")
-    log.info(changed_to)
-    log.info("############### end of diff_pd ###############")
     # pd_result = pd.DataFrame({'from': changed_from, 'to': changed_to},
     #                       index=changed.index)
     return {'index': changed.index, 'from': changed_from, 'to': changed_to}

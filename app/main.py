@@ -84,12 +84,12 @@ class Main(KytosNApp):
     @oxp_name.setter
     def oxp_name(self, oxp_name):
         """ Property for OXP_URL """
+        log.info(dir(self.storehouse))
         self.storehouse.save_oxp_name(oxp_name)
 
     @property
     def current_kytos_topology(self):
         """ Property for Topology """
-        log.info("########## current_kytos_topology ##########")
         return self.get_kytos_topology
 
     @listen_to('kytos/storehouse.loaded')
@@ -97,7 +97,7 @@ class Main(KytosNApp):
         """Function meant for validation, to make sure that the storehouse napp
         has been loaded before all the other functions that use it begins to
         call it."""
-        if not self.storehouse:
+        if self.storehouse is None:
             self.storehouse = storehouse.StoreHouse(self.controller)  \
                     # pylint: disable=W0201
 
@@ -106,47 +106,32 @@ class Main(KytosNApp):
         """Function meant for validation, to make sure that the storehouse
         napp has been loaded before all the other functions that use it begins
         to call it."""
-        log.info('############# @listen_to("kytos/topology.*") #############')
-        log.info(event.name)
-        log.info(event.timestamp)
         event_type = 0
         admin_events = [
                 "kytos/topology.switch.enabled",
                 "kytos/topology.switch.disabled"]
         operational_events = [
-                "kytos/topology.link.up",
-                "kytos/topology.link.down"]
+                "kytos/topology.link_up",
+                "kytos/topology.link_down"]
         if event.name in admin_events:
-            log.info("########## admin Event##########")
             event_type = 1
-        elif event.name in operational_events:
-            log.info("########## operational Event##########")
+        elif event.name in operational_events and event.timestamp is not None:
             event_type = 2
         else:
-            log.info("########## None ##########")
-            return
+            return {"error": "None"}
 
-        log.info("########## calling create_update_topology #########")
         if self.storehouse:
-            log.info("########## self.storehouse ##########")
-            log.info(self.storehouse)
             if self.storehouse.box is not None:
-                log.info("########## self.storehouse.box ##########")
-                log.info(self.storehouse.box)
-                self.create_update_topology(event_type, event.timestamp)
                 self.topology_loaded = True  # pylint: disable=W0201
-            else:
-                log.info("########## not self.storehouse.box ##########")
-        else:
-            log.info("########## not self.storehouse ##########")
-        log.info("###########################################")
+                return self.create_update_topology(event_type, event.timestamp)
+            return {"error": "not self.storehouse.box"}
+        return {"error": "not self.storehouse"}
 
     @listen_to("kytos/topology.unloaded")
     def unload_topology(self):  # pylint: disable=W0613
         """Function meant for validation, to make sure that the storehouse napp
         has been loaded before all the other functions that use it begins to
         call it."""
-        log.info('######## @listen_to("kytos/topology.unloaded") ########')
         self.topology_loaded = False  # pylint: disable=W0201
 
     def test_kytos_topology(self):

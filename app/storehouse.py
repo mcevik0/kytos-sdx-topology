@@ -24,7 +24,6 @@ class StoreHouse:
 
     def __init__(self, controller):
         """Create a storehouse instance."""
-        log.info("########## StoreHouse __init__ #########")
         self.controller = controller
         self.namespace = 'kytos.sdx.storehouse.version'
         self._lock = threading.Lock()
@@ -41,8 +40,6 @@ class StoreHouse:
             self.get_stored_box(self.box.box_id)
         except Exception:  # pylint: disable=W0703
             return {}
-        log.info("########## get_data ##########")
-        log.info(self.box.data)
         return self.box.data
 
     def create_box(self):
@@ -60,8 +57,6 @@ class StoreHouse:
 
         self.controller.buffers.app.put(event)
 
-        log.info('########### Create box from storehouse ##########')
-
     def _create_box_callback(self, _event, data, error):
         """Execute a callback to log the output of the create_box function."""
         if error:
@@ -73,9 +68,6 @@ class StoreHouse:
     def update_box(self):
         """Update an existing box with a new version value after a topology
         change is detected."""
-        log.info("########## update_box ##########")
-        log.info(self.counter)
-        log.info("########## counter ##########")
         self._lock.acquire()  # avoid race condition  # pylint: disable=R1732
         log.debug(f'Lock {self._lock} acquired.')
         self.counter += 1
@@ -138,12 +130,9 @@ class StoreHouse:
     def update_timestamp(self, time_stamp):
         """Update an existing box with a new timestamp value after a topology
         change is detected."""
-        log.info("########## update_timestamp ##########")
-        log.info(self.time_stamp)
-        log.info("########## timestamp ##########")
         self._lock.acquire()  # avoid race condition  # pylint: disable=R1732
         log.debug(f'Lock {self._lock} acquired.')
-        self.time_stamp = time_stamp
+        self.time_stamp = utils.get_timestamp(time_stamp)
         self.box.data["time_stamp"] = self.time_stamp
         content = {'namespace': self.namespace,
                    'box_id': self.box.box_id,
