@@ -1,12 +1,23 @@
 """
 SDX Topology main Unit test
 """
-from napps.kytos.sdx_topology import main  # pylint: disable=E0401
+from dataclasses import dataclass
+from napps.kytos.sdx_topology.main import Main
+from tests.unit.helpers import get_controller_mock
 
 
-def test_load_topology(event):
-    '''test event class'''
-    event.name = "kytos/topology.switch.enabled"
-    print(event.name, event.timestamp)
-    assert event.name == "kytos/topology.switch.enabled"
-    print(main.storehouse)
+@dataclass
+class TestMain(Main):
+    '''class main'''
+    napp = Main(get_controller_mock())
+    print(dir(napp))
+    napp.oxp_name = 'amlight'
+    print(napp.oxp_name)
+    assert 2 == 1
+    # name = napp.get_oxp_name()
+
+
+def test_class():
+    '''class main'''
+    test = TestMain()
+    print(test)

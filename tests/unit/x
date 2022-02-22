@@ -1,0 +1,23 @@
+"""
+SDX Topology main Unit test
+"""
+from dataclasses import dataclass
+from flask import Flask
+# , asdict
+from napps.kytos.sdx_topology.main import Main
+
+
+app = Flask('test')
+
+
+@dataclass
+class TestMain(Main):
+    '''class main'''
+
+    def test_one(self):
+        '''class main'''
+        with app.app_context():
+            print(Main.get_oxp_name(self))
+            assert 2 == 1
+
+    test_one(self)
