@@ -1,7 +1,7 @@
 """
 SDX Topology util Unit test
 """
-from app import utils  # pylint: disable=E0401
+from napps.kytos.sdx_topology import utils  # pylint: disable=E0401
 
 
 def test_get_timestamp():
