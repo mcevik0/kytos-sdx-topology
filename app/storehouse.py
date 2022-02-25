@@ -28,27 +28,27 @@ class StoreHouse:
         self.namespace = 'kytos.sdx.storehouse.version'
         self._lock = threading.Lock()
 
+        self.counter = 0
+        self.time_stamp = utils.get_timestamp()
         if 'box' not in self.__dict__:
             self.box = None
         self.list_stored_boxes()
-        self.counter = 0
-        self.time_stamp = utils.get_timestamp()
 
     def get_data(self):
         """Return the box data."""
-        log.info("########## get_data ##########")
+        log.debug("########## get_data ##########")
         try:
             self.get_stored_box(self.box.box_id)
         except Exception:  # pylint: disable=W0703
             return {}
-        log.info("########## self.box.data ##########")
-        log.info(self.box.data)
-        log.info("########## end get_data ##########")
+        log.debug("########## self.box.data ##########")
+        log.debug(self.box.data)
+        log.debug("########## end get_data ##########")
         return self.box.data
 
     def create_box(self):
         """Create a new box with the napp version information"""
-        log.info("########## create box ##########")
+        log.debug("########## create box ##########")
         content = {'namespace': 'kytos.sdx.storehouse.version',
                    'callback': self._create_box_callback,
                    'data': {"version": self.counter,
@@ -57,6 +57,7 @@ class StoreHouse:
                             "oxp_url": ""
                             }
                    }
+        log.debug(content)
 
         event = KytosEvent(name='kytos.storehouse.create', content=content)
 
@@ -64,10 +65,12 @@ class StoreHouse:
 
     def _create_box_callback(self, _event, data, error):
         """Execute a callback to log the output of the create_box function."""
+        log.debug("########## _create box callback ##########")
         if error:
             log.error(f'Can\'t create box with namespace {self.namespace}')
 
         self.box = data
+        log.debug(self.box)
         log.debug(f'Box {self.box.box_id} was created in {self.namespace}.')
 
     def update_box(self):
@@ -95,12 +98,12 @@ class StoreHouse:
 
     def get_stored_box(self, box_id):
         """Retrieve box from storehouse."""
-        log.info("######### get_stored_box ##########")
+        log.debug("######### get_stored_box ##########")
         content = {'namespace': self.namespace,
                    'callback': self._get_box_callback,
                    'box_id': box_id,
                    'data': {}}
-
+        log.debug(content)
         name = 'kytos.storehouse.retrieve'
         event = KytosEvent(name=name, content=content)
         self.controller.buffers.app.put(event)
@@ -108,8 +111,10 @@ class StoreHouse:
 
     def _get_box_callback(self, _event, data, error):
         """Execute a callback to log the get_stored_box function output."""
-        self.box = data
+        log.debug("######### _get_box_callback ##########")
 
+        self.box = data
+        log.debug(self.box)
         if error:
             log.error(f'Box {data.box_id} not found in {self.namespace}.')
 
@@ -117,19 +122,27 @@ class StoreHouse:
 
     def list_stored_boxes(self):
         """List all boxes using the current namespace."""
+        log.debug("######### list stored boxes ##########")
         name = 'kytos.storehouse.list'
         content = {'namespace': self.namespace,
-                   'callback': self._get_or_create_a_box_from_list_of_boxes}
+                   'callback': self._get_create_box}
 
+        log.debug("######### list stored boxes content  ##########")
+        log.debug(name)
+        log.debug(content)
         event = KytosEvent(name=name, content=content)
         self.controller.buffers.app.put(event)
         log.debug(f'Bootstraping storehouse box for {self.namespace}.')
 
-    def _get_or_create_a_box_from_list_of_boxes(self, _event, data, _error):
+    def _get_create_box(self, _event, data, _error):
         """Create a new box or retrieve the stored box."""
+        log.debug("######### _get create box ##########")
         if data:
+            log.debug("######### data  ##########")
+            log.debug(data)
             self.get_stored_box(data[0])
         else:
+            log.debug("######### calling create box  ##########")
             self.create_box()
 
     def update_timestamp(self, time_stamp):

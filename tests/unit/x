@@ -1,0 +1,41 @@
+"""
+SDX Topology main Unit test
+"""
+from dataclasses import dataclass
+from napps.kytos.sdx_topology.main import Main as AppMain
+from napps.kytos.sdx_topology.storehouse import StoreHouse as AppStoreHouse
+from tests.unit.helpers import get_controller_mock
+
+
+@dataclass
+class StoreHouse(AppStoreHouse):
+    '''class storehouse'''
+    # print(dir(controller.api_server.app.app_context))
+    storehouse = AppStoreHouse(get_controller_mock())
+
+
+@dataclass
+class Main(AppMain):
+    '''class main'''
+    # print(dir(controller.api_server.app.app_context))
+    main = AppMain(get_controller_mock())
+    storehouse = StoreHouse().storehouse
+    print("main.storehouse")
+    print(main.storehouse)
+    main.load_storehouse()
+    print("main.storehouse")
+    print(main.storehouse)
+    print("dir(storehouse)")
+    print(dir(storehouse))
+    print("dir(storehouse.box)")
+    print(dir(storehouse.box))
+    storehouse.create_box()
+    print("dir(storehouse.box)")
+    print(dir(storehouse.box))
+    # print(dir(main.storehouse))
+    main.oxp_url = 'amlight.net'
+    print("main.oxp_url")
+    print(main.oxp_url)
+    main.oxp_name = 'amlight'
+    print(main.oxp_name)
+    assert 2 == 1

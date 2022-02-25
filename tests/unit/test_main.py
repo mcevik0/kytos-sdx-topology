@@ -2,22 +2,28 @@
 SDX Topology main Unit test
 """
 from dataclasses import dataclass
-from napps.kytos.sdx_topology.main import Main
+from napps.kytos.sdx_topology.main import Main as AppMain
 from tests.unit.helpers import get_controller_mock
 
 
 @dataclass
-class TestMain(Main):
-    '''class main'''
-    napp = Main(get_controller_mock())
-    print(dir(napp))
-    napp.oxp_name = 'amlight'
-    print(napp.oxp_name)
-    assert 2 == 1
-    # name = napp.get_oxp_name()
+class Main(AppMain):
+    '''class main
+    napps.kytos.sdx_topology.main.storehouse.StoreHouse.save_oxp_url'''
+    # print(dir(AppMain))
+    main = AppMain(get_controller_mock())
 
 
-def test_class():
-    '''class main'''
-    test = TestMain()
-    print(test)
+def test_oxp_url(mocker):
+    '''function test oxp_name'''
+
+    def mock_oxp_url():
+        return 'amlight.net'
+
+    mocker.patch(
+            'app.main.StoreHouse.save_oxp_url',
+            mock_oxp_url)
+    Main().main.oxp_url = 'amlight.net'
+    actual = Main().main.oxp_url
+    print(actual)
+    assert actual == 'amlight.net'
