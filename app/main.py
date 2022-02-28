@@ -135,7 +135,7 @@ class Main(KytosNApp):
             _ = self.get_kytos_topology()
             return True
         except Exception as err:  # pylint: disable=W0703
-            log.debug(err)
+            log.info(err)
             return False
 
     @staticmethod
@@ -157,7 +157,7 @@ class Main(KytosNApp):
             self.oxp_url = request.get_json()
 
         except Exception as err:  # pylint: disable=W0703
-            log.debug(err)
+            log.info(err)
             return jsonify(err), 401
 
         if not isinstance(self.oxp_url, str):
@@ -179,7 +179,7 @@ class Main(KytosNApp):
 
         except BadRequest:
             result = "The request body is not a well-formed JSON."
-            log.debug("oxp_name result %s %s", result, 400)
+            log.info("oxp_name result %s %s", result, 400)
             raise BadRequest(result) from BadRequest
 
         if not isinstance(oxp_name, str):
@@ -195,32 +195,32 @@ class Main(KytosNApp):
                 data = request.json
             except BadRequest:
                 result = "The request body is not a well-formed JSON."
-                log.debug("Validate data result %s %s", result, 400)
+                log.info("Validate data result %s %s", result, 400)
                 raise BadRequest(result) from BadRequest
             if data is None:
                 result = "The request body mimetype is not application/json."
-                log.debug("update result %s %s", result, 415)
+                log.info("update result %s %s", result, 415)
                 raise UnsupportedMediaType(result)
             response = utils.validate_request(spec, request)
             return jsonify(response["data"]), response["code"]
         # debug only
-        log.debug(self.topology_loaded)
-        log.debug(self.test_kytos_topology())
+        log.info(self.topology_loaded)
+        log.info(self.test_kytos_topology())
         return jsonify("Topology napp has not loaded"), 401
 
     @rest("v1/topology")
     def get_topology_version(self):
         """ REST to return the topology following the SDX data model"""
-        log.debug("######### v1/topology ##########")
+        log.info("######### v1/topology ##########")
         if not self.oxp_url:
-            log.debug("######### not self.oxp_url ##########")
+            log.info("######### not self.oxp_url ##########")
             return (
                 jsonify("Submit oxp_url previous to request topology schema"),
                 401,
             )
 
         if not self.oxp_name:
-            log.debug("######### not self.oxp_name ##########")
+            log.info("######### not self.oxp_name ##########")
             return (
                 jsonify("Submit oxp_name previous to request topology schema"),
                 401,
@@ -228,9 +228,9 @@ class Main(KytosNApp):
 
         if self.topology_loaded or self.test_kytos_topology():
             try:
-                log.debug("########## topology update ##########")
+                log.info("########## topology update ##########")
                 topology_update = self.create_update_topology()
-                log.debug(topology_update)
+                log.info(topology_update)
                 topology_dict = {
                     "id": topology_update["id"],
                     "name": topology_update["name"],
@@ -247,12 +247,12 @@ class Main(KytosNApp):
                     return jsonify(topology_update), 200
                 return jsonify(validate_topology.json()), 400
             except Exception as err:  # pylint: disable=W0703
-                log.debug(err)
+                log.info(err)
                 return jsonify("Validation Error"), 400
 
         # debug only
-        log.debug(self.topology_loaded)
-        log.debug(self.test_kytos_topology())
+        log.info(self.topology_loaded)
+        log.info(self.test_kytos_topology())
         return jsonify("Topology napp has not loaded"), 401
 
     @rest("v1/eval_kytos_topology", methods=["POST"])
@@ -271,17 +271,17 @@ class Main(KytosNApp):
         kytos.storehouse.version within the storehouse and create a
         box object containing the version data that will be updated
         every time a change is detected in the topology."""
-        log.debug("########## create_update_topology ##########")
+        log.info("########## create_update_topology ##########")
         if event_type == 1:
             self.storehouse.update_box()
         elif event_type == 2:
             self.storehouse.update_timestamp(event_timestamp)
-        log.debug("########## version ##########")
+        log.info("########## version ##########")
         version = self.storehouse.get_data()["version"]
-        log.debug("########## timestamp ##########")
+        log.info("########## timestamp ##########")
         timestamp = self.storehouse.get_data()["time_stamp"]
-        log.debug("########## end timestamp ##########")
-        log.debug(timestamp)
+        log.info("########## end timestamp ##########")
+        log.info(timestamp)
         return ParseTopology(
             topology=self.get_kytos_topology(),
             version=version,
