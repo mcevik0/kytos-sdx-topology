@@ -38,7 +38,7 @@ def diff_pd(current_params, initial_params):
         # Data Types are different, trying to convert
         initial_df = initial_df.astype(current_df.dtypes)
     if current_df.equals(initial_df):
-        return {"message:": "No changes"}
+        return {'index': 'no changes', 'from': '', 'to': ''}
     # need to account for np.nan != np.nan returning True
     diff_mask = (current_df != initial_df) & \
         ~(current_df.isnull() & initial_df.isnull())
@@ -48,9 +48,9 @@ def diff_pd(current_params, initial_params):
     difference_locations = np.where(diff_mask)
     changed_from = current_df.values[difference_locations]
     changed_to = initial_df.values[difference_locations]
-    # pd_result = pd.DataFrame({'from': changed_from, 'to': changed_to},
-    #                       index=changed.index)
-    return {'index': changed.index, 'from': changed_from, 'to': changed_to}
+    return {'index': changed.index[0][1],
+            'from': changed_from[0],
+            'to': changed_to[0]}
 
 
 def load_spec():

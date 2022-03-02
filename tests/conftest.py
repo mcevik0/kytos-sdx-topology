@@ -34,3 +34,18 @@ def api_data():
         data = json.load(json_file)
         json_file.close()
     return data
+
+
+@pytest.fixture
+def df_data():
+    """ Build dataframe compare data """
+    actual_dir = os.getcwd()
+    file_a = actual_dir + "/tests/df1.json"
+    file_b = actual_dir + "/tests/df2.json"
+    with open(file_a, encoding="utf8") as encoded_a:
+        json_a = json.load(encoded_a)
+        encoded_a.close()
+    with open(file_b, encoding="utf8") as encoded_b:
+        json_b = json.load(encoded_b)
+        encoded_b.close()
+    return (json_a, json_b)

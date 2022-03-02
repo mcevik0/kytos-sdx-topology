@@ -56,7 +56,7 @@ class Main(KytosNApp):
 
     @property
     def oxp_url(self):
-        """ Property for OXP_URL"""
+        """ Property for OXP_URL """
         try:
             data = self.storehouse.get_data()
         except Exception:  # pylint: disable=W0703
@@ -106,11 +106,15 @@ class Main(KytosNApp):
         napp has been loaded before all the other functions that use it begins
         to call it."""
         event_type = 0
-        if event.name in settings.ADMIN_EVENTS:
+        admin_events = [
+                "kytos/topology.switch.enabled",
+                "kytos/topology.switch.disabled"]
+        operational_events = [
+                "kytos/topology.link_up",
+                "kytos/topology.link_down"]
+        if event.name in admin_events:
             event_type = 1
-        elif (
-                event.name in settings.OPERATIONAL_EVENTS and
-                event.timestamp is not None):
+        elif event.name in operational_events and event.timestamp is not None:
             event_type = 2
         else:
             return {"error": "None"}
@@ -190,6 +194,7 @@ class Main(KytosNApp):
     @rest("v1/validate", methods=["POST"])
     def get_validate(self):
         """ REST to validate the topology following the SDX data model"""
+        log.info("######### v1/validate ##########")
         if self.topology_loaded or self.test_kytos_topology():
             try:
                 data = request.json
@@ -201,6 +206,8 @@ class Main(KytosNApp):
                 result = "The request body mimetype is not application/json."
                 log.info("update result %s %s", result, 415)
                 raise UnsupportedMediaType(result)
+            log.info("######### spec ##########")
+            log.info(spec)
             response = utils.validate_request(spec, request)
             return jsonify(response["data"]), response["code"]
         # debug only
