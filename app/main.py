@@ -273,6 +273,7 @@ class Main(KytosNApp):
             params_diff = utils.diff_pd(current_params, initial_params)
         return jsonify(params_diff), 200
 
+    @rest("v1/get_sdx_topology", methods=["GET"])
     def create_update_topology(self, event_type=0, event_timestamp=None):
         """Function that will take care of initializing the namespace
         kytos.storehouse.version within the storehouse and create a

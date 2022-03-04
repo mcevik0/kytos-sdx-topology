@@ -4,6 +4,8 @@ KYTOS_TOPOLOGY_URL = "http://localhost:8181/api/kytos/topology/v3/"
 AMLIGHT_TOPOLOGY = "http://3.218.56.104:8181/api/kytos/topology/v3"
 TENET_TOPOLOGY_API = "http://23.20.21.212:8181/api/kytos/topology/v3"
 SDX_TOPOLOGY_API = "http://0.0.0.0:8181/api/kytos/sdx_topology/v1"
+GET_SDX_TOPOLOGY = \
+        "http://0.0.0.0:8181/api/kytos/sdx_topology/v1/get_sdx_topology"
 VALIDATE_TOPOLOGY = \
         "http://0.0.0.0:8181/api/kytos/sdx_topology/v1/validate"
 HEADERS = {"Content-type": "application/json"}
