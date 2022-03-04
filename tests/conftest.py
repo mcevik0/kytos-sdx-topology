@@ -5,6 +5,18 @@ import os
 import json
 import pytest
 from kytos.core.events import KytosEvent
+from .run import create_app
+
+
+@pytest.fixture(scope="session")
+def flask_app():
+    ''' flask app '''
+    abs_file_path = os.path.abspath(os.path.dirname(__file__))
+    openapi_path = os.path.join(abs_file_path, "../", "app")
+    os.environ["SPEC_PATH"] = openapi_path
+
+    app = create_app()
+    return app
 
 
 @pytest.fixture

@@ -208,6 +208,8 @@ class Main(KytosNApp):
                 raise UnsupportedMediaType(result)
             log.info("######### spec ##########")
             log.info(spec)
+            log.info("######### request ##########")
+            log.info(request)
             response = utils.validate_request(spec, request)
             return jsonify(response["data"]), response["code"]
         # debug only
