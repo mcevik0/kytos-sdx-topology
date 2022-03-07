@@ -160,7 +160,7 @@ $ <venv>/bin/pip-compile dev.in
 
 # Pytest
 
-python3 -m pytest --cov=app
+python3 -m pytest --cov=app --cov-report=html
 
 # Partial test
 

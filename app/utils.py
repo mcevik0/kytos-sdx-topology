@@ -1,4 +1,4 @@
-"""Utility functions."""
+"""SDX topology Utility functions"""
 from datetime import datetime
 from pathlib import Path
 from openapi_core import create_spec
@@ -6,9 +6,9 @@ from openapi_core.contrib.flask import FlaskOpenAPIRequest
 from openapi_core.validation.request.validators import RequestValidator
 from openapi_spec_validator import validate_spec
 from openapi_spec_validator.readers import read_from_filename
+import numpy as np
 import pandas as pd
 import pytz
-import numpy as np
 
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
@@ -72,6 +72,7 @@ def validate_request(spec, data_request):
     validator = RequestValidator(spec)
     openapi_request = FlaskOpenAPIRequest(data_request)
     result = validator.validate(openapi_request)
+    error_response = {}
     if result.errors:
         errors = result.errors[0]
         if hasattr(errors, "schema_errors"):
