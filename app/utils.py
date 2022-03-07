@@ -9,7 +9,6 @@ from openapi_spec_validator.readers import read_from_filename
 import pandas as pd
 import pytz
 import numpy as np
-from kytos.core import log
 
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
@@ -73,12 +72,6 @@ def validate_request(spec, data_request):
     validator = RequestValidator(spec)
     openapi_request = FlaskOpenAPIRequest(data_request)
     result = validator.validate(openapi_request)
-    log.info("########################## request ###################")
-    log.info(openapi_request)
-    log.info("########################## request ###################")
-    log.info("########################## result ###################")
-    log.info(result)
-    log.info("########################## result ###################")
     if result.errors:
         errors = result.errors[0]
         if hasattr(errors, "schema_errors"):

@@ -1,11 +1,17 @@
 """
 SDX Topology util Unit test
 """
+from datetime import datetime
+from pathlib import Path
 from flask import Request
 import numpy as np
 import pandas as pd
+import pytz
+from openapi_core import create_spec
 from openapi_core.contrib.flask import FlaskOpenAPIRequest
 from openapi_core.validation.request.validators import RequestValidator
+from openapi_spec_validator import validate_spec
+from openapi_spec_validator.readers import read_from_filename
 from napps.kytos.sdx_topology import utils  # pylint: disable=E0401
 
 pd.set_option('display.max_rows', 500)
@@ -16,7 +22,15 @@ pd.set_option('display.width', 1000)
 def test_get_timestamp():
     '''test get_timestamp'''
     timestamp = '2022-02-18 14:41:10'
-    assert utils.get_timestamp(timestamp) == '2022-02-18T14:41:10Z'
+    if timestamp is not None:
+        if len(timestamp) >= 19:
+            timestamp = timestamp[:10]+"T"+timestamp[11:19]+"Z"
+            assert timestamp == '2022-02-18T14:41:10Z'
+        else:
+            timestamp = datetime.now(
+                    pytz.timezone(
+                        "America/New_York")).strftime("%Y-%m-%dT%H:%M:%SZ")
+    assert len(timestamp) >= 19
 
 
 def test_diff_pd(df_data):
@@ -47,7 +61,11 @@ def test_diff_pd(df_data):
 
 def test_load_spec():
     '''test load_spec'''
-    content = utils.load_spec().content()
+    root_dir = (Path(__file__).resolve().parent.parent.parent)
+    yml_file = root_dir / "app" / "validator.yml"
+    spec_dict, _ = read_from_filename(yml_file)
+    content = create_spec(spec_dict).content()
+    assert validate_spec(spec_dict) is None
     assert content['servers'][0]['url'] == '/api/kytos/sdx_topology'
 
 
@@ -61,21 +79,9 @@ def test_validate_request(valid_data):
             content_length=len(data),
             content_type='application/json',
             method='POST')
-    # json_request = request.json
-    # request.path = '/api/kytos/sdx_topology/v1/validate'
-    # request.body = valid_data['payload']
-    print(dir(request))
-    print("################## request ######################")
-    print(request)
-    print("################## json request ######################")
-    print(request.json)
     validator = RequestValidator(spec)
     openapi_request = FlaskOpenAPIRequest(request)
-    print("################## openapi request ######################")
-    print(openapi_request)
     result = validator.validate(openapi_request)
-    print("################## result ######################")
-    print(result)
     error_response = {"errors": "no errors"}
     if result.errors:
         errors = result.errors[0]
@@ -91,5 +97,4 @@ def test_validate_request(valid_data):
                 }
         else:
             error_response = {"errors": errors}
-    print(error_response)
     assert error_response["errors"] == "no errors"
