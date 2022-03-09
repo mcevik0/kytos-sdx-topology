@@ -3,7 +3,6 @@ SDX Topology main Unit test
 """
 from dataclasses import dataclass
 import requests
-# from flask import Request
 from napps.kytos.sdx_topology.main import Main as AppMain
 from napps.kytos.sdx_topology.storehouse import StoreHouse as AppStoreHouse
 from .helpers import get_controller_mock
@@ -78,8 +77,10 @@ def test_get_validate(mocker, valid_data):
             'napps.kytos.sdx_topology.utils.validate_request',
             mock_validate_request)
 
-    # return_value = mock_validate_request()
-    mocker.patch('napps.kytos.sdx_topology.main.Main.get_validate')
-    # mocker.response(return_value)
+    response = Main().main.get_validate()
+    assert "data" in response
 
-    print(Main().main.get_validate())
+
+def test_get_topology_version():
+    """ REST to return the topology following the SDX data model"""
+

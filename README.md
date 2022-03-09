@@ -169,3 +169,5 @@ pytest -v -k "test_sdx_topology"
 # Unit test
 
 pytest tests/unit/test_main.py
+
+pytest --cov app --cov-branch --cov-report term-missing

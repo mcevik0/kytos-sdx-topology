@@ -87,5 +87,5 @@ def validate_request(spec, data_request):
                 }
         else:
             error_response = {"errors": errors}
-        return {"data": error_response, "code": 400}
-    return {"data": data_request.json, "code": 200}
+        return (error_response, 400)
+    return (data_request.json, 200)
