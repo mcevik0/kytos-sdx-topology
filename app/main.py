@@ -1,9 +1,6 @@
 """
 Main module of amlight/sdx Kytos Network Application.
-
-SDX API
 """
-
 import requests
 from flask import jsonify, request
 from werkzeug.exceptions import BadRequest, UnsupportedMediaType
@@ -197,7 +194,7 @@ class Main(KytosNApp):
         log.info("######### v1/validate ##########")
         if self.topology_loaded or self.test_kytos_topology():
             try:
-                data = request.json
+                data = request  # pylint: disable=W0201
             except BadRequest:
                 result = "The request body is not a well-formed JSON."
                 log.info("Validate data result %s %s", result, 400)
@@ -209,8 +206,8 @@ class Main(KytosNApp):
             log.info("######### spec ##########")
             log.info(spec)
             log.info("######### request ##########")
-            log.info(request)
-            response = utils.validate_request(spec, request)
+            log.info(data)
+            response = utils.validate_request(spec, data)
             return jsonify(response["data"]), response["code"]
         # debug only
         log.info(self.topology_loaded)

@@ -3,6 +3,7 @@ SDX Topology main Unit test
 """
 from dataclasses import dataclass
 import requests
+# from flask import Request
 from napps.kytos.sdx_topology.main import Main as AppMain
 from napps.kytos.sdx_topology.storehouse import StoreHouse as AppStoreHouse
 from .helpers import get_controller_mock
@@ -11,9 +12,7 @@ from .helpers import get_controller_mock
 @dataclass
 class Main(AppMain):
     '''class main
-    napps.kytos.sdx_topology.main.Main.oxp_url,
     napps.kytos.sdx_topology.main.storehouse.StoreHouse.save_oxp_url'''
-    # print(dir(AppMain))
     main = AppMain(get_controller_mock())
 
 
@@ -21,8 +20,14 @@ class Main(AppMain):
 class StoreHouse(AppStoreHouse):
     '''class StoreHouse
     napps.kytos.sdx_topology.main.storehouse.StoreHouse.save_oxp_url'''
-    # print(dir(AppMain))
     storehouse = AppStoreHouse(get_controller_mock())
+
+
+def test_setup():
+    """Replace the '__init__' method for the KytosNApp subclass."""
+    Main().main.setup()
+    assert Main().main.topology_loaded is False
+    assert Main().main.storehouse is None
 
 
 def test_mock_oxp_url(mocker):
@@ -59,3 +64,22 @@ def test_get_oxp_name(api_data):
     assert response.status_code == 200
     assert isinstance(response.json(), str)
     assert "Amlight" in response.json()
+
+
+def test_get_validate(mocker, valid_data):
+    """ REST to validate the topology following the SDX data model"""
+
+    def mock_validate_request(spec=None, data_request=None):
+        data_request = valid_data['payload']
+        spec = 200
+        return {"data": data_request, "code": spec}
+
+    mocker.patch(
+            'napps.kytos.sdx_topology.utils.validate_request',
+            mock_validate_request)
+
+    # return_value = mock_validate_request()
+    mocker.patch('napps.kytos.sdx_topology.main.Main.get_validate')
+    # mocker.response(return_value)
+
+    print(Main().main.get_validate())
