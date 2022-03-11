@@ -183,3 +183,8 @@ class StoreHouse:
             log.error("Can not update the self.box.box_id")
 
         log.debug(f'Box {data.box_id} was updated.')
+
+
+def get_store_house():
+    """ Instantiate the class """
+    return StoreHouse()

@@ -31,7 +31,6 @@ class Main(KytosNApp):  # pylint: disable=R0904
         So, if you have any setup routine, insert it here.
         """
         self.topology_loaded = False
-        self.storehouse = None
 
     def execute(self):
         """Run after the setup method execution.
@@ -87,6 +86,16 @@ class Main(KytosNApp):  # pylint: disable=R0904
     def current_kytos_topology(self):
         """ Property for Topology """
         return self.get_kytos_topology
+
+    @property
+    def storehouse(self):
+        """ Property for storehouse """
+        try:
+            my_storehouse = storehouse.StoreHouse(self.controller)  \
+                    # pylint: disable=W0201
+        except Exception:  # pylint: disable=W0703
+            return storehouse.get_store_house()
+        return my_storehouse
 
     @listen_to('kytos/storehouse.loaded')
     def load_storehouse(self, event=None):  # pylint: disable=W0613
@@ -268,8 +277,13 @@ class Main(KytosNApp):  # pylint: disable=R0904
             self.storehouse.update_box()
         elif event_type == 2:
             self.storehouse.update_timestamp(event_timestamp)
-        version = self.storehouse.get_data()["version"]
-        timestamp = self.storehouse.get_data()["time_stamp"]
+        try:
+            version = self.storehouse.get_data()['version']
+            timestamp = self.storehouse.get_data()["time_stamp"]
+        except Exception as err:  # pylint: disable=W0703:
+            log.info(err)
+            version = 1
+            timestamp = utils.get_timestamp()
         return ParseTopology(
             topology=self.get_kytos_topology(),
             version=version,

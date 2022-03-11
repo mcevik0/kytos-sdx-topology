@@ -26,7 +26,6 @@ def test_setup():
     """Replace the '__init__' method for the KytosNApp subclass."""
     Main().main.setup()
     assert Main().main.topology_loaded is False
-    assert Main().main.storehouse is None
 
 
 def test_mock_oxp_url(mocker):
@@ -81,6 +80,12 @@ def test_get_validate(mocker, valid_data):
     assert "data" in response
 
 
-def test_get_topology_version():
-    """ REST to return the topology following the SDX data model"""
+def test_create_update_topology(mocker, valid_data):
+    """ Function that will take care of initializing the namespace
+        kytos.storehouse.version within the storehouse and create a
+        box object containing the version data that will be updated
+        every time a change is detected in the topology."""
 
+    print(dir(Main.main.storehouse))
+    response = Main().main.create_update_topology()
+    assert "id" in response

@@ -39,5 +39,5 @@ def test_validate_request(valid_data):
             content_length=len(data),
             content_type='application/json',
             method='POST')
-    result, status_code = utils.validate_request(spec, request)
+    _, status_code = utils.validate_request(spec, request)
     assert status_code == 200
