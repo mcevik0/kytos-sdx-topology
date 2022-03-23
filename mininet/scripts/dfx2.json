@@ -1,0 +1,155 @@
+{
+  "2547e1a4e514b06cc9e346e20d0dbd199da83340e78031d632ce398edc5c0453": {
+    "active": true,
+    "enabled": true,
+    "endpoint_a": {
+      "active": true,
+      "enabled": true,
+      "id": "",
+      "link": "2547e1a4e514b06cc9e346e20d0dbd199da83340e78031d632ce398edc5c0453",
+      "lldp": true,
+      "mac": "c6:84:ae:86:53:2c",
+      "metadata": {
+        "mtu": 9000,
+        "port_name": "eth2"
+      },
+      "name": "Ampath1-eth2",
+      "nni": true,
+      "port_number": 2,
+      "speed": 1250000000,
+      "switch": "aa:00:00:00:00:00:00:01",
+      "type": "interface",
+      "uni": false
+    },
+    "endpoint_b": {
+      "active": true,
+      "enabled": true,
+      "id": "aa:00:00:00:00:00:00:03:2",
+      "link": "2547e1a4e514b06cc9e346e20d0dbd199da83340e78031d632ce398edc5c0453",
+      "lldp": true,
+      "mac": "26:a4:0f:17:62:e1",
+      "metadata": {
+        "mtu": 9000,
+        "port_name": "eth2"
+      },
+      "name": "Ampath3-eth2",
+      "nni": true,
+      "port_number": 2,
+      "speed": 1250000000,
+      "switch": "aa:00:00:00:00:00:00:03",
+      "type": "interface",
+      "uni": false
+    },
+    "id": "2547e1a4e514b06cc9e346e20d0dbd199da83340e78031d632ce398edc5c0453",
+    "metadata": {
+      "availability": 99.5,
+      "last_status_is_active": true,
+      "latency": 27,
+      "link_name": "Link_2547e1a4e514b06cc9",
+      "packet_loss": 0.007911,
+      "residual_bandwidth": 97
+    }
+  },
+  "4b7b34ca81ef25f18b453f6ea2f4ed328d9db4beba0e6b2eeab3dd2441f3b36b": {
+    "active": true,
+    "enabled": true,
+    "endpoint_a": {
+      "active": true,
+      "enabled": true,
+      "id": "aa:00:00:00:00:00:00:02:3",
+      "link": "4b7b34ca81ef25f18b453f6ea2f4ed328d9db4beba0e6b2eeab3dd2441f3b36b",
+      "lldp": true,
+      "mac": "1e:79:6f:9c:5e:77",
+      "metadata": {
+        "mtu": 9000,
+        "port_name": "eth3"
+      },
+      "name": "Ampath2-eth3",
+      "nni": true,
+      "port_number": 3,
+      "speed": 1250000000,
+      "switch": "aa:00:00:00:00:00:00:02",
+      "type": "interface",
+      "uni": false
+    },
+    "endpoint_b": {
+      "active": true,
+      "enabled": true,
+      "id": "aa:00:00:00:00:00:00:03:3",
+      "link": "4b7b34ca81ef25f18b453f6ea2f4ed328d9db4beba0e6b2eeab3dd2441f3b36b",
+      "lldp": true,
+      "mac": "fa:78:e1:8a:1a:53",
+      "metadata": {
+        "mtu": 9000,
+        "port_name": "eth3"
+      },
+      "name": "Ampath3-eth3",
+      "nni": true,
+      "port_number": 3,
+      "speed": 1250000000,
+      "switch": "aa:00:00:00:00:00:00:03",
+      "type": "interface",
+      "uni": false
+    },
+    "id": "4b7b34ca81ef25f18b453f6ea2f4ed328d9db4beba0e6b2eeab3dd2441f3b36b",
+    "metadata": {
+      "availability": 99.5,
+      "last_status_is_active": true,
+      "latency": 17,
+      "link_name": "Link_4b7b34ca81ef25f18b",
+      "packet_loss": 0.003111,
+      "residual_bandwidth": 15
+    }
+  },
+  "4cc24894f8996177a380169523ebdb3f19cdd5527d4a2e8f1bcba668f3f98e22": {
+    "active": true,
+    "enabled": true,
+    "endpoint_a": {
+      "active": true,
+      "enabled": true,
+      "id": "aa:00:00:00:00:00:00:02:1",
+      "link": "4cc24894f8996177a380169523ebdb3f19cdd5527d4a2e8f1bcba668f3f98e22",
+      "lldp": true,
+      "mac": "66:53:ce:b9:f0:42",
+      "metadata": {
+        "mtu": 9000,
+        "port_name": "eth1"
+      },
+      "name": "Ampath2-eth1",
+      "nni": true,
+      "port_number": 1,
+      "speed": 1250000000,
+      "switch": "aa:00:00:00:00:00:00:02",
+      "type": "interface",
+      "uni": false
+    },
+    "endpoint_b": {
+      "active": true,
+      "enabled": true,
+      "id": "aa:00:00:00:00:00:00:01:1",
+      "link": "4cc24894f8996177a380169523ebdb3f19cdd5527d4a2e8f1bcba668f3f98e22",
+      "lldp": true,
+      "mac": "0a:f9:42:42:45:72",
+      "metadata": {
+        "mtu": 9000,
+        "port_name": "eth1"
+      },
+      "name": "Ampath1-eth1",
+      "nni": true,
+      "port_number": 1,
+      "speed": 1250000000,
+      "switch": "aa:00:00:00:00:00:00:01",
+      "type": "interface",
+      "uni": false
+    },
+    "id": "4cc24894f8996177a380169523ebdb3f19cdd5527d4a2e8f1bcba668f3f98e22",
+    "metadata": {
+      "availability": 99.5,
+      "last_status_is_active": true,
+      "latency": 83,
+      "link_name": "Link_4cc24894f8996177a3",
+      "packet_loss": 0.0021541,
+      "residual_bandwidth": 23
+    }
+  }
+}
