@@ -128,7 +128,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
         if self.storehouse:
             if self.storehouse.box is not None:
                 self.topology_loaded = True  # pylint: disable=W0201
-                return self.create_update_topology(event_type, event.timestamp)
+                return self.get_topology_version(event_type, event.timestamp)
             return {"error": "not self.storehouse.box"}
         return {"error": "not self.storehouse"}
 
@@ -223,7 +223,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
         response, status_code = self.get_topology_version()
         return jsonify(response), status_code
 
-    def get_topology_version(self):
+    def get_topology_version(self, event_type=0, event_timestamp=None):
         """ return the topology following the SDX data model"""
         if not self.oxp_url:
             return ("Submit oxp_url previous to request topology schema", 401)
@@ -231,7 +231,8 @@ class Main(KytosNApp):  # pylint: disable=R0904
             return ("Submit oxp_name previous to request topology schema", 401)
         if self.topology_loaded or self.test_kytos_topology():
             try:
-                topology_update = self.create_update_topology()
+                topology_update = self.create_update_topology(
+                        event_type, event_timestamp)
                 topology_dict = {
                     "id": topology_update["id"],
                     "name": topology_update["name"],
@@ -245,6 +246,8 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     settings.VALIDATE_TOPOLOGY, json=topology_dict
                 )
                 if validate_topology.status_code == 200:
+                    requests.post(
+                            settings.SDX_LC, json=topology_update)
                     return (topology_update, 200)
                 return (validate_topology.json(), 400)
             except Exception as err:  # pylint: disable=W0703
