@@ -247,7 +247,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
                 )
                 if validate_topology.status_code == 200:
                     requests.post(
-                            settings.SDX_LC, json=topology_update)
+                            settings.SDX_LC, json=topology_dict)
                     return (topology_update, 200)
                 return (validate_topology.json(), 400)
             except Exception as err:  # pylint: disable=W0703
