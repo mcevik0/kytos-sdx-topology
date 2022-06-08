@@ -11,7 +11,8 @@ from napps.kytos.sdx_topology import settings  # pylint: disable=E0401
 from napps.kytos.sdx_topology import storehouse  # pylint: disable=E0401
 from napps.kytos.sdx_topology.topology_class import (ParseTopology) \
         # pylint: disable=E0401
-from napps.kytos.sdx_topology import utils  # pylint: disable=E0401
+from napps.kytos.sdx_topology import utils, topology_mock  \
+        # pylint: disable=E0401
 
 spec = utils.load_spec()
 
@@ -231,24 +232,27 @@ class Main(KytosNApp):  # pylint: disable=R0904
             return ("Submit oxp_name previous to request topology schema", 401)
         if self.topology_loaded or self.test_kytos_topology():
             try:
-                topology_update = self.create_update_topology(
+                if event_type != 0:
+                    topology_update = self.create_update_topology(
                         event_type, event_timestamp)
-                topology_dict = {
-                    "id": topology_update["id"],
-                    "name": topology_update["name"],
-                    "version": topology_update["version"],
-                    "model_version": topology_update["model_version"],
-                    "timestamp": topology_update["timestamp"],
-                    "nodes": topology_update["nodes"],
-                    "links": topology_update["links"],
-                }
+                    topology_dict = {
+                        "id": topology_update["id"],
+                        "name": topology_update["name"],
+                        "version": topology_update["version"],
+                        "model_version": topology_update["model_version"],
+                        "timestamp": topology_update["timestamp"],
+                        "nodes": topology_update["nodes"],
+                        "links": topology_update["links"],
+                    }
+                else:
+                    topology_dict = utils.topology_mock()
                 validate_topology = requests.post(
                     settings.VALIDATE_TOPOLOGY, json=topology_dict
                 )
                 if validate_topology.status_code == 200:
                     requests.post(
                             settings.SDX_LC, json=topology_dict)
-                    return (topology_update, 200)
+                    return (topology_dict, 200)
                 return (validate_topology.json(), 400)
             except Exception as err:  # pylint: disable=W0703
                 log.info(err)
