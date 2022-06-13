@@ -246,8 +246,6 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     }
                 else:
                     topology_dict = topology_mock.topology_mock()
-                    log.info("########## Data from topology_mock ##########")
-                    log.info(topology_dict)
                 validate_topology = requests.post(
                     settings.VALIDATE_TOPOLOGY, json=topology_dict
                 )
@@ -284,10 +282,6 @@ class Main(KytosNApp):  # pylint: disable=R0904
             log.info(err)
             version = 1
             timestamp = utils.get_timestamp()
-        log.info("######## version ########")
-        log.info(version)
-        log.info("######## time_stamp ########")
-        log.info(timestamp)
         return ParseTopology(
             topology=self.get_kytos_topology(),
             version=version,
