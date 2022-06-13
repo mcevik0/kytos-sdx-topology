@@ -11,29 +11,15 @@ def topology_mock():
             "timestamp": "2000-01-23T04:56:07Z",
             "links": [
                 {
-                    "id": "urn:sdx:link:amlight:B1-B2",
-                    "name": "amlight:B1-B2",
+                    "id": "urn:sdx:link:amlight:B1:B2",
+                    "name": "amlight_B1_B2",
                     "ports": [
-                        {
-                            "id": "urn:sdx:port:amlight.net:B1:2",
-                            "name": "Novi01:2",
-                            "node": "urn:sdx:node:amlight.net:B1",
-                            "type": "10GE",
-                            "status": "up",
-                            "state": "enabled"
-                        },
-                        {
-                            "id": "urn:sdx:port:amlight.net:B2:2",
-                            "name": "Novi02:2",
-                            "node": "urn:sdx:node:amlight.net:B2",
-                            "type": "10GE",
-                            "status": "up",
-                            "state": "enabled"
-                        }
+                        "urn:sdx:port:amlight.net:B1:2",
+                        "urn:sdx:port:amlight.net:B2:2",
                     ],
                     "type": "inter",
-                    "bandwidth": 80083.7389632821,
-                    "residual_bandwidth": 602746.015561422,
+                    "bandwidth": 125000000,
+                    "residual_bandwidth": 100,
                     "latency": 146582.15146899645,
                     "packet_loss": 59.621339166831824,
                     "availability": 56.37376656633328,
@@ -41,29 +27,15 @@ def topology_mock():
                     "state": "enabled"
                 },
                 {
-                    "id": "urn:sdx:link:amlight:A1-B1",
-                    "name": "amlight:A1-B1",
+                    "id": "urn:sdx:link:amlight:A1:B1",
+                    "name": "amlight_A1_B1",
                     "ports": [
-                        {
-                            "id": "urn:sdx:port:amlight.net:A1:1",
-                            "name": "Novi100:1",
-                            "node": "urn:sdx:node:amlight.net:A1",
-                            "type": "10GE",
-                            "status": "up",
-                            "state": "enabled"
-                        },
-                        {
-                            "id": "urn:sdx:port:amlight.net:B1:3",
-                            "name": "Novi01:3",
-                            "node": "urn:sdx:node:amlight.net:B1",
-                            "type": "10GE",
-                            "status": "up",
-                            "state": "enabled"
-                        }
+                        "urn:sdx:port:amlight.net:A1:1",
+                        "urn:sdx:port:amlight.net:B1:3",
                     ],
                     "type": "inter",
-                    "bandwidth": 80083.7389632821,
-                    "residual_bandwidth": 602746.015561422,
+                    "bandwidth": 125000000,
+                    "residual_bandwidth": 100,
                     "latency": 146582.15146899645,
                     "packet_loss": 59.621339166831824,
                     "availability": 56.37376656633328,
@@ -71,29 +43,15 @@ def topology_mock():
                     "state": "enabled"
                 },
                 {
-                    "id": "urn:sdx:link:amlight:A1-B2",
-                    "name": "amlight:A1-B2",
+                    "id": "urn:sdx:link:amlight:A1:B2",
+                    "name": "amlight_A1_B2",
                     "ports": [
-                        {
-                            "id": "urn:sdx:port:amlight.net:A1:2",
-                            "name": "Novi100:2",
-                            "node": "urn:sdx:node:amlight.net:A1",
-                            "type": "10GE",
-                            "status": "up",
-                            "state": "enabled"
-                        },
-                        {
-                            "id": "urn:sdx:port:amlight.net:B2:3",
-                            "name": "Novi02:3",
-                            "node": "urn:sdx:node:amlight.net:B2",
-                            "type": "10GE",
-                            "status": "up",
-                            "state": "enabled"
-                        }
+                        "urn:sdx:port:amlight.net:A1:2",
+                        "urn:sdx:port:amlight.net:B2:3",
                     ],
                     "type": "inter",
-                    "bandwidth": 80083.7389632821,
-                    "residual_bandwidth": 602746.015561422,
+                    "bandwidth": 125000000,
+                    "residual_bandwidth": 100,
                     "latency": 146582.15146899645,
                     "packet_loss": 59.621339166831824,
                     "availability": 56.37376656633328,
@@ -101,29 +59,15 @@ def topology_mock():
                     "state": "enabled"
                 },
                 {
-                    "id": "urn:sdx:link:nni:Miami-Sanpaolo",
-                    "name": "nni:Miami-Sanpaolo",
+                    "id": "urn:sdx:link:nni:Miami:Sanpaolo",
+                    "name": "nni_Miami_Sanpaolo",
                     "ports": [
-                        {
-                            "id": "urn:sdx:port:amlight:B1:1",
-                            "name": "Novi01_1",
-                            "node": "urn:sdx:node:amlight.net:B1",
-                            "type": "10GE",
-                            "status": "up",
-                            "state": "enabled"
-                        },
-                        {
-                            "id": "urn:ogf:network:sdx:port:sax:B1:1",
-                            "name": "Novi01_1",
-                            "node": "urn:sdx:port:sax:B1",
-                            "type": "10GE",
-                            "status": "up",
-                            "state": "enabled"
-                        }
+                        "urn:sdx:port:amlight:B1:1",
+                        "urn:sdx:port:sax:B1:1",
                     ],
                     "type": "inter",
-                    "bandwidth": 80083.7389632821,
-                    "residual_bandwidth": 602746.015561422,
+                    "bandwidth": 125000000,
+                    "residual_bandwidth": 100,
                     "latency": 146582.15146899645,
                     "packet_loss": 59.621339166831824,
                     "availability": 56.37376656633328,
@@ -131,29 +75,15 @@ def topology_mock():
                     "state": "enabled"
                 },
                 {
-                    "id": "urn:sdx:link:nni:BocaRaton-Fortaleza",
-                    "name": "nni:BocaRaton-Fortaleza",
+                    "id": "urn:sdx:link:nni:BocaRaton:Fortaleza",
+                    "name": "nni_BocaRaton_Fortaleza",
                     "ports": [
-                        {
-                            "id": "urn:sdx:port:amlight.net:B2:1",
-                            "name": "Novi02_1",
-                            "node": "urn:sdx:node:amlight.net:B2",
-                            "type": "10GE",
-                            "status": "up",
-                            "state": "enabled"
-                        },
-                        {
-                            "id": "urn:sdx:port:sax:B2:1",
-                            "name": "Novi02_1",
-                            "node": "urn:ogf:network:sdx:node:sax:B2",
-                            "type": "10GE",
-                            "status": "up",
-                            "state": "enabled"
-                        }
+                        "urn:sdx:port:amlight.net:B2:1",
+                        "urn:sdx:port:sax:B2:1",
                     ],
                     "type": "inter",
-                    "bandwidth": 80083.7389632821,
-                    "residual_bandwidth": 602746.015561422,
+                    "bandwidth": 125000000,
+                    "residual_bandwidth": 100,
                     "latency": 146582.15146899645,
                     "packet_loss": 59.621339166831824,
                     "availability": 56.37376656633328,
