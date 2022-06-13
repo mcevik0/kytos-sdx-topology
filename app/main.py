@@ -245,7 +245,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
                         "links": topology_update["links"],
                     }
                 else:
-                    topology_dict = utils.topology_mock()
+                    topology_dict = topology_mock.topology_mock()
                 validate_topology = requests.post(
                     settings.VALIDATE_TOPOLOGY, json=topology_dict
                 )
@@ -255,6 +255,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     return (topology_dict, 200)
                 return (validate_topology.json(), 400)
             except Exception as err:  # pylint: disable=W0703
+                log.info("########### Validation Error exception ############")
                 log.info(err)
                 return ("Validation Error", 400)
         return ("Topology napp has not loaded", 401)
