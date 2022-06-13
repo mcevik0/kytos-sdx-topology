@@ -246,6 +246,8 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     }
                 else:
                     topology_dict = topology_mock.topology_mock()
+                    log.info("########## Data from topology_mock ##########")
+                    log.info(topology_dict)
                 validate_topology = requests.post(
                     settings.VALIDATE_TOPOLOGY, json=topology_dict
                 )
