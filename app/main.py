@@ -260,17 +260,6 @@ class Main(KytosNApp):  # pylint: disable=R0904
                 return ("Validation Error", 400)
         return ("Topology napp has not loaded", 401)
 
-    @rest("v1/eval_kytos_topology", methods=["POST"])
-    def get_df_diff(self):
-        """ REST to return the kytos topology with pandas df """
-        eval_param = request.get_json()
-        current_params = self.current_kytos_topology()[eval_param]
-        initial_params = self.initial_kytos_topology()[eval_param]
-        params_diff = {}
-        if current_params and initial_params:
-            params_diff = utils.diff_pd(current_params, initial_params)
-        return params_diff
-
     @rest("v1/get_sdx_topology", methods=["GET"])
     def get_sdx_topology(self):
         """ REST to return the SDX Topology """
@@ -289,9 +278,14 @@ class Main(KytosNApp):  # pylint: disable=R0904
             version = self.storehouse.get_data()['version']
             timestamp = self.storehouse.get_data()["time_stamp"]
         except Exception as err:  # pylint: disable=W0703:
+            log.info("######### Version/time_stamp Error exception #########")
             log.info(err)
             version = 1
             timestamp = utils.get_timestamp()
+        log.info("######## version ########")
+        log.info(version)
+        log.info("######## time_stamp ########")
+        log.info(timestamp)
         return ParseTopology(
             topology=self.get_kytos_topology(),
             version=version,
