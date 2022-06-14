@@ -9,19 +9,23 @@ Requirements
 
 * kytos/core
 * kytos/topology
-* kytos/storehouse
+* mongodb
+* docker
 * openAPI Specification
 * swagger client
 * flask
-* python 3.7
+* python 3.9
+* curl
+* mininet
 
 Preparing the environment:
 ==========================
 
 ``Installing Python``
 
-If you don't have Python 3 installed, please install it. Please make sure that you're using python3.6
-or a later version::
+If you don't have Python 3 installed, please install it. Please make sure that you're using python3.9
+
+Installation script of: Python, Pip, Virtual Env, Mongodb, Docker and dependencies for Debian 10 
 
 $ apt install python3
 
