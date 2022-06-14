@@ -7,69 +7,100 @@ Kytos Napp to handle the requirements of the AtlanticWave-SDX project.
 Requirements
 ============
 
-* kytos/core
-* kytos/topology
+* Debian 10
 * mongodb
 * docker
 * openAPI Specification
 * swagger client
 * flask
 * python 3.9
+* python3-pip
+* python3-ven
+* kytos/core
+* kytos/topology
 * curl
 * mininet
 
 Preparing the environment:
 ==========================
 
-``Installing Python``
+``Installing Python, Docker and Mongodb``
 
-If you don't have Python 3 installed, please install it. Please make sure that you're using python3.9
+* If you don't have Python 3 installed, please install it. Please make sure that you're using python3.9
 
-Installation script of: Python, Pip, Virtual Env, Mongodb, Docker and dependencies for Debian 10 
+** 1.- Python, Pip, Virtual Env, Mongodb, Docker and dependencies for Debian 10 
 
-$ apt install python3
+** Download and Run:
 
-``Installing Docker & Kytos``
+https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/0_envsetup.sh
 
-Then, create a docker container to contain all your work. To download a docker image with kytos pre-installed run: ::
+$ ./0_envsetup.sh
 
-$ docker pull kytos/nightly:latest
-$ docker run -d --name kytos -p 6653:6653 -p 8181:8181 --privileged kytos/nightly:latest /usr/bin/tail -f /dev/null
+``Installing Kytos Virtual env``
 
-Now, access a shell session inside your container::
+** 2.- Virtual environment and Kytos
 
-$ docker exec -it kytos bash
+** Download and Run:
 
-Make sure kytos is running::
+https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/1_kytosdir.sh
 
-$ kytosd -E # run kytos in the background
+$ ./1_kytosdir.sh
 
-or ::
+** Download and run inside /kytos directory:
 
-$ kytosd -E -f # run kytos in the foreground
+https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/2_venvinstall.sh
 
-``Installing Mininet``
+$ cd /kytos
 
-Download VirtualBox and install Mininet. Then to set-up your network, run the following::
+$ ./2_venvinstall.sh
 
-$ mn --topo linear,3 --controller=remote,ip=,port=6653
+``Activate environment and install python dependencies``
 
+** 3.- Python dependencies
 
+$ cd /kytos
 
-Downloading the SDX Kytos Napp
-================================
+$ source python-kytos/bin/activate
 
+** Download and run after the environment is activated
 
-All of the Kytos Network Applications are located in the NApps online repository. To install the SDX NApp, run the
-following from inside the docker container::
+https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/3_pipinstall.sh
 
-$ kytos napps install amlight/sdx
+(python-kytos)$ ./3_pipinstall.sh
 
-Or we can clone directly from the Amlight Github repository via git::
+``Clone Kytos``
 
-$ git clone https://github.com/atlanticwave-sdx/kytos-sdx-topology.git sdx_topology
-$ cd sdx_topology
-$ python3 setup.py develop
+** 4.- kytos python-openflow kytos-utils flow_manager mef_eline of_core of_lldp pathfinder storehouse topology and sdx_topology
+
+** Download and run inside /kytos directory:
+
+https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/4_clone_kytos.sh
+
+$ cd /kytos
+
+$ ./4_clone_kytos.sh
+
+``Installing Kytos``
+
+5.- kytos and napps setup
+
+** Download and run inside /kytos directory:
+
+https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/5_install_kytos.sh 
+
+$ ./5_install_kytos.sh
+
+``Install Docker mongodb container``
+
+** Inside /kytos/kytos run docker-compose
+
+$ cd /kytos/kytos
+
+$ docker-compose up -d
+
+``run Kytos``
+
+kytosd -f --database mongodb
 
 
 Installing swagger_client
