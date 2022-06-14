@@ -28,9 +28,9 @@ Preparing the environment:
 
 * If you don't have Python 3 installed, please install it. Please make sure that you're using python3.9
 
-** 1.- Python, Pip, Virtual Env, Mongodb, Docker and dependencies for Debian 10 
+* 1.- Python, Pip, Virtual Env, Mongodb, Docker and dependencies for Debian 10 
 
-** Download and Run:
+* Download and Run:
 
 https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/0_envsetup.sh
 
@@ -38,15 +38,15 @@ $ ./0_envsetup.sh
 
 ``Installing Kytos Virtual env``
 
-** 2.- Virtual environment and Kytos
+* 2.- Virtual environment and Kytos
 
-** Download and Run:
+* Download and Run:
 
 https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/1_kytosdir.sh
 
 $ ./1_kytosdir.sh
 
-** Download and run inside /kytos directory:
+* Download and run inside /kytos directory:
 
 https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/2_venvinstall.sh
 
@@ -56,13 +56,13 @@ $ ./2_venvinstall.sh
 
 ``Activate environment and install python dependencies``
 
-** 3.- Python dependencies
+* 3.- Python dependencies
 
 $ cd /kytos
 
 $ source python-kytos/bin/activate
 
-** Download and run after the environment is activated
+* Download and run after the environment is activated
 
 https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/3_pipinstall.sh
 
@@ -70,9 +70,9 @@ https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/instal
 
 ``Clone Kytos``
 
-** 4.- kytos python-openflow kytos-utils flow_manager mef_eline of_core of_lldp pathfinder storehouse topology and sdx_topology
+* 4.- kytos python-openflow kytos-utils flow_manager mef_eline of_core of_lldp pathfinder storehouse topology and sdx_topology
 
-** Download and run inside /kytos directory:
+* Download and run inside /kytos directory:
 
 https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/4_clone_kytos.sh
 
@@ -84,7 +84,7 @@ $ ./4_clone_kytos.sh
 
 5.- kytos and napps setup
 
-** Download and run inside /kytos directory:
+* Download and run inside /kytos directory:
 
 https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/5_install_kytos.sh 
 
@@ -92,7 +92,7 @@ $ ./5_install_kytos.sh
 
 ``Install Docker mongodb container``
 
-** Inside /kytos/kytos run docker-compose
+* Inside /kytos/kytos run docker-compose
 
 $ cd /kytos/kytos
 
