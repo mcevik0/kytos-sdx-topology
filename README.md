@@ -66,7 +66,7 @@ $ source python-kytos/bin/activate
 
 https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/3_pipinstall.sh
 
-(python-kytos)$ ./3_pipinstall.sh
+(venv-python3.9) ./3_pipinstall.sh
 
 ``Clone Kytos``
 
@@ -76,9 +76,9 @@ https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/instal
 
 https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/4_clone_kytos.sh
 
-$ cd /kytos
+(venv-python3.9) cd /kytos
 
-$ ./4_clone_kytos.sh
+(venv-python3.9) ./4_clone_kytos.sh
 
 ``Installing Kytos``
 
@@ -88,19 +88,35 @@ $ ./4_clone_kytos.sh
 
 https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/5_install_kytos.sh 
 
-$ ./5_install_kytos.sh
+(venv-python3.9) ./5_install_kytos.sh
 
 ``Install Docker mongodb container``
 
+* Download and Run:
+
+https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/6_add-etc-hosts.sh
+
+(venv-python3.9) cd /kytos/sdx_topology/install
+
+(venv-python3.9) ./6_add-etc-hosts.sh
+
 * Inside /kytos/kytos run docker-compose
 
-$ cd /kytos/kytos
+(venv-python3.9) cd /kytos/kytos
 
-$ docker-compose up -d
+(venv-python3.9) docker-compose up -d
+
+* Download and Run:
+
+https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/7_rs-init.sh
+
+(venv-python3.9) cd /kytos/sdx_topology/install
+
+(venv-python3.9) ./7_rs-init.sh
 
 ``run Kytos``
 
-kytosd -f --database mongodb
+(venv-python3.9) kytosd -f --database mongodb
 
 
 Installing swagger_client
