@@ -100,6 +100,8 @@ https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/instal
 
 (venv-python3.9) ./6_add-etc-hosts.sh
 
+* After add hosts, restart the network interface or the host
+
 * Inside /kytos/kytos run docker-compose
 
 (venv-python3.9) cd /kytos/kytos
@@ -118,6 +120,15 @@ https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/instal
 
 (venv-python3.9) kytosd -f --database mongodb
 
+``run Mock provisioning``
+
+* In another terminal start the flask app to Mock Provisioning listening
+
+(venv-python3.9) /kytos/sdx_topology/envsetup/sdx_lc_mock/flaskrun.sh
+
+* This will be listening on the endpoint: 
+
+* http://0.0.0.0:8088/SDX-LC/1.0.0/provision
 
 Installing swagger_client
 ==========================
