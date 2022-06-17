@@ -47,11 +47,11 @@ mv Python-3.9.10 .local/.
 cd .local/Python-3.9.10
 ./configure --prefix=/home/admin/.local
 sudo make clean
-make
-make altinstall
+sudo make
+sudo make altinstall
 sudo update-alternatives --install /usr/bin/python3 python3 /home/admin/.local/bin/python3.9 1
 cd ~/.local/lib/python3.9/site-packages/
-ln -s /usr/share/pyshared/lsb_release.py lsb_release.py
+ln -s /usr/share/pyshared/lsb_release.py /usr/local/lib/python3.9/site-packages/lsb_release.py
 
 sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
@@ -68,3 +68,6 @@ sudo apt-get install -y mongodb-org-shell
 
 sudo apt install python3-pip
 sudo apt install python3-ven
+sudo ln -s /usr/local/bin/pip3.9 /usr/local/bin/pip3
+sudo ln -s /usr/local/bin/pip3.9 /usr/local/bin/pip
+pip3 install --upgrade pip
