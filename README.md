@@ -124,7 +124,7 @@ https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/instal
 
 * In another terminal start the flask app to Mock Provisioning listening
 
-(venv-python3.9) /kytos/sdx_topology/envsetup/sdx_lc_mock/flaskrun.sh
+https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/sdx_lc_mock/flaskrun.sh
 
 * This will be listening on the endpoint: 
 
