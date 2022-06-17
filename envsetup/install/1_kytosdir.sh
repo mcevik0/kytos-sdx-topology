@@ -18,4 +18,6 @@ cp ./2_venvinstall.sh /kytos/2_venvinstall.sh
 cp ./3_postinstall.sh /kytos/3_postinstall.sh
 cp ./4_clone_kytos.sh /kytos/.
 cp ./5_install_kytos.sh /kytos/.
+cp ./docker-compose.yml /kytos/.
+cp ./env /kytos/.env
 cd /kytos
