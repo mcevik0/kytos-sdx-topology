@@ -9,6 +9,7 @@ GET_SDX_TOPOLOGY = \
 VALIDATE_TOPOLOGY = \
         "http://0.0.0.0:8181/api/kytos/sdx_topology/v1/validate"
 SDX_LC = "http://0.0.0.0:8080/SDX-LC/1.0.0/topology"
+SDX_PROVISIONING = "http://0.0.0.0:8088/SDX-LC/1.0.0/provision"
 HEADERS = {"Content-type": "application/json"}
 ADMIN_EVENTS = [
         "kytos/topology.switch.enabled",

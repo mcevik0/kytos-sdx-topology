@@ -18,5 +18,17 @@ def receive_topology():
     return jsonify(data)
 
 
+@app.route('/SDX-LC/1.0.0/provision', methods=['POST'])
+def receive_provision():
+    """ listen for sdx provisioning """
+    try:
+        data = request.json
+    except BadRequest:
+        result = "The request body is not a well-formed JSON."
+        print("%s %s", result, 400)
+        raise BadRequest(result) from BadRequest
+    return jsonify(data)
+
+
 if __name__ == '__main__':
     app.run()
