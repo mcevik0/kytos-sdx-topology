@@ -233,6 +233,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
         if self.topology_loaded or self.test_kytos_topology():
             try:
                 if event_type != 0:
+                    event_timestamp = utils.get_timestamp(event_timestamp)
                     topology_update = self.create_update_topology(
                         event_type, event_timestamp)
                     topology_dict = {

@@ -36,19 +36,14 @@ class StoreHouse:
 
     def get_data(self):
         """Return the box data."""
-        log.info("########## get_data ##########")
         try:
             self.get_stored_box(self.box.box_id)
         except Exception:  # pylint: disable=W0703
             return {}
-        log.info("########## self.box.data ##########")
-        log.info(self.box.data)
-        log.info("########## end get_data ##########")
         return self.box.data
 
     def create_box(self):
         """Create a new box with the napp version information"""
-        log.info("########## create box ##########")
         content = {'namespace': 'kytos.sdx.storehouse.version',
                    'callback': self._create_box_callback,
                    'data': {"version": self.counter,
@@ -95,7 +90,6 @@ class StoreHouse:
 
     def get_stored_box(self, box_id):
         """Retrieve box from storehouse."""
-        log.info("######### get_stored_box ##########")
         content = {'namespace': self.namespace,
                    'callback': self._get_box_callback,
                    'box_id': box_id,

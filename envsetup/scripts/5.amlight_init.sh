@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SDX_API="http://3.218.56.104:8181/api/kytos/sdx_topology/v1"
-TOPOLOGY_API="http://3.218.56.104:8181/api/kytos/topology/v3"
+SDX_API="http://172.31.2.93:8181/api/kytos/sdx_topology/v1"
+TOPOLOGY_API="http://172.31.2.93:8181/api/kytos/topology/v3"
 
 # SDX-related variables
 echo '########## oxp_name ########## '

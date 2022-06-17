@@ -6,50 +6,21 @@ from openapi_core.contrib.flask import FlaskOpenAPIRequest
 from openapi_core.validation.request.validators import RequestValidator
 from openapi_spec_validator import validate_spec
 from openapi_spec_validator.readers import read_from_filename
-import numpy as np
-import pandas as pd
 import pytz
-
-pd.set_option('display.max_rows', 500)
-pd.set_option('display.max_columns', 500)
-pd.set_option('display.width', 1000)
+from kytos.core import log
 
 
 def get_timestamp(timestamp=None):
     """Function to obtain the current time_stamp in a specific format"""
     if timestamp is not None:
-        if len(timestamp) >= 19:
-            return timestamp[:10]+"T"+timestamp[11:19]+"Z"
-    return datetime.now(
+        if isinstance(timestamp, datetime):
+            timestamp = timestamp.strftime("%Y-%m-%dT%H:%M:%SZ")
+        elif len(timestamp) >= 19:
+            timestamp = timestamp[:10]+"T"+timestamp[11:19]+"Z"
+    else:
+        timestamp = datetime.now(
             pytz.timezone("America/New_York")).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-
-def diff_pd(current_params, initial_params):
-    """Identify differences between two pandas DataFrames"""
-    current_dict = [v for (k, v) in current_params.items()]
-    current_df = pd.json_normalize(current_dict)
-    initial_dict = [v for (k, v) in initial_params.items()]
-    initial_df = pd.json_normalize(initial_dict)
-
-    assert (current_df.columns == initial_df.columns).all(), \
-        "DataFrame column names are different"
-    if any(current_df.dtypes != initial_df.dtypes):
-        # Data Types are different, trying to convert
-        initial_df = initial_df.astype(current_df.dtypes)
-    if current_df.equals(initial_df):
-        return {'index': 'no changes', 'from': '', 'to': ''}
-    # need to account for np.nan != np.nan returning True
-    diff_mask = (current_df != initial_df) & \
-        ~(current_df.isnull() & initial_df.isnull())
-    ne_stacked = diff_mask.stack()
-    changed = ne_stacked[ne_stacked]
-    changed.index.names = ['id', 'col']
-    difference_locations = np.where(diff_mask)
-    changed_from = current_df.values[difference_locations]
-    changed_to = initial_df.values[difference_locations]
-    return {'index': changed.index[0][1],
-            'from': changed_from[0],
-            'to': changed_to[0]}
+    return timestamp
 
 
 def load_spec():
