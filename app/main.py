@@ -92,4 +92,6 @@ class Main(KytosNApp):  # pylint: disable=R0904
         sdx_topology = self.load_topology()
         log.info("######### sdx_topology #########")
         log.info(sdx_topology)
-        return sdx_topology
+        if sdx_topology:
+            return sdx_topology
+        return {}
