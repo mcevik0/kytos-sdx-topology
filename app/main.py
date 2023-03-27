@@ -85,6 +85,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
             log.info("######### load_topology error #########")
             log.info(err)
 
+    @rest("v1/get_sdx_topology", methods=["GET"])
     def get_sdx_topology(self):
         """ REST to return the SDX Topology """
         log.info("######### get_sdx_topology #########")
