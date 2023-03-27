@@ -71,13 +71,12 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     "event_name": event.name,
                     "timestamp": event.timestamp,
                     "topology": topology}
-            log.info("######### Create Update Topology k #########")
             # log.info(topology_info["event"])
-            log.info("topology_info['event_type']")
+            log.info("######### Topology_info event_type #########")
             log.info(topology_info["event_type"])
-            log.info("topology_info['event_name']")
+            log.info("######### Topology_info event_name #########")
             log.info(topology_info["event_name"])
-            log.info("topology_info['timestamp']")
+            log.info("######### Topology_info timestamp #########")
             log.info(topology_info["timestamp"])
             # log.info(topology_info[topology])
             if event_type != 0:
