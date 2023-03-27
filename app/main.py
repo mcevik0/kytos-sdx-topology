@@ -40,6 +40,14 @@ class Main(KytosNApp):  # pylint: disable=R0904
         If you have some cleanup procedure, insert it here.
         """
 
+    @staticmethod
+    def get_kytos_topology():
+        """retrieve topology from API"""
+        kytos_topology = requests.get(settings.KYTOS_TOPOLOGY_URL).json()
+        log.info("######### get_kytos_topology #########")
+        log.info(kytos_topology)
+        return kytos_topology["topology"]
+
     @listen_to("kytos/topology.*")
     def load_topology(self, event=None):  # pylint: disable=W0613
         """ Function meant for listen topology """
@@ -67,13 +75,8 @@ class Main(KytosNApp):  # pylint: disable=R0904
             if event_type != 0:
                 pass
         except Exception as err:  # pylint: disable=W0703
+            log.info("######### load_topology error #########")
             log.info(err)
-
-    @staticmethod
-    def get_kytos_topology():
-        """retrieve topology from API"""
-        kytos_topology = requests.get(settings.KYTOS_TOPOLOGY_URL).json()
-        return kytos_topology["topology"]
 
     def get_sdx_topology(self):
         """ REST to return the SDX Topology """
