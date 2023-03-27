@@ -45,7 +45,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
         """retrieve topology from API"""
         kytos_topology = requests.get(settings.KYTOS_TOPOLOGY_URL).json()
         log.info("######### get_kytos_topology #########")
-        log.info(kytos_topology)
+        # log.info(kytos_topology)
         return kytos_topology["topology"]
 
     @listen_to("kytos/topology.*")
@@ -72,9 +72,12 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     "timestamp": event.timestamp,
                     "topology": topology}
             log.info("######### Create Update Topology k #########")
-            log.info(topology_info["event"])
+            # log.info(topology_info["event"])
+            log.info("topology_info['event_type']")
             log.info(topology_info["event_type"])
+            log.info("topology_info['event_name']")
             log.info(topology_info["event_name"])
+            log.info("topology_info['timestamp']")
             log.info(topology_info["timestamp"])
             # log.info(topology_info[topology])
             if event_type != 0:
