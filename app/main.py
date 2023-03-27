@@ -51,6 +51,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
     @listen_to("kytos/topology.*")
     def load_topology(self, event=None):  # pylint: disable=W0613
         """ Function meant for listen topology """
+        log.info("######### load_topology #########")
         event_type = 0
         admin_events = [
                 "kytos/topology.switch.enabled",
@@ -70,8 +71,12 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     "event_name": event.name,
                     "timestamp": event.timestamp,
                     "topology": topology}
-            log.info("######### Create Update Topology #########")
-            log.info(topology_info)
+            log.info("######### Create Update Topology k #########")
+            log.info(topology_info["event"])
+            log.info(topology_info["event_type"])
+            log.info(topology_info["event_name"])
+            log.info(topology_info["timestamp"])
+            # log.info(topology_info[topology])
             if event_type != 0:
                 pass
         except Exception as err:  # pylint: disable=W0703
@@ -80,4 +85,5 @@ class Main(KytosNApp):  # pylint: disable=R0904
 
     def get_sdx_topology(self):
         """ REST to return the SDX Topology """
+        log.info("######### get_sdx_topology #########")
         return self.load_topology()
