@@ -6,8 +6,10 @@ from werkzeug.exceptions import BadRequest
 
 from kytos.core import KytosNApp, rest, log
 from kytos.core.helpers import listen_to
-from napps.kytos.sdx_topology import settings  # pylint: disable=E0401
-# pylint: disable=E0401
+from napps.kytos.sdx_topology.topology_class import (ParseTopology) \
+         # pylint: disable=E0401
+from napps.kytos.sdx_topology import settings, utils, topology_mock \
+        # pylint: disable=E0401
 
 
 class Main(KytosNApp):  # pylint: disable=R0904
@@ -48,6 +50,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
         # log.info(kytos_topology)
         return kytos_topology["topology"]
 
+
     @listen_to("kytos/topology.*")
     def load_topology(self, event=None):  # pylint: disable=W0613
         """ Function meant for listen topology """
@@ -85,9 +88,9 @@ class Main(KytosNApp):  # pylint: disable=R0904
             log.info("######### load_topology error #########")
             log.info(err)
 
-    @rest("v1/get_sdx_topology", methods=["GET"])
+    @rest("v2/get_sdx_topology", methods=["GET"])
     def get_sdx_topology(self):
-        """ REST to return the SDX Topology """
+        """ consume the SDX Topology """
         log.info("######### get_sdx_topology #########")
         sdx_topology = self.load_topology()
         log.info("######### sdx_topology #########")
