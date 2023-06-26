@@ -6,11 +6,7 @@ from werkzeug.exceptions import BadRequest
 
 from kytos.core import KytosNApp, rest, log
 from kytos.core.helpers import listen_to
-from napps.kytos.sdx_topology.topology_class import (ParseTopology) \
-         # pylint: disable=E0401
-from napps.kytos.sdx_topology import settings, utils, topology_mock \
-        # pylint: disable=E0401
-
+from napps.kytos.sdx_topology import settings # pylint: disable=E0401
 
 class Main(KytosNApp):  # pylint: disable=R0904
     """Main class of amlight/sdx NApp.
