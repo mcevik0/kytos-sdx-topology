@@ -22,6 +22,9 @@ class Main(KytosNApp):  # pylint: disable=R0904
 
         So, if you have any setup routine, insert it here.
         """
+        log.info("################################")
+        log.info("######### sdx topology #########")
+        log.info("################################")
         self.event_info = {} # pylint: disable=W0201
 
     def execute(self):
@@ -48,7 +51,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
         try:
             topology = requests.get(settings.KYTOS_TOPOLOGY_URL).json()
             self.event_info = {"event": event, "topology": topology} # pylint: disable=W0201
-            requests.post(settings.SDX_LC).json(self.event_info)
+            requests.post(settings.SDX_CONSTRUCTOR).json(self.event_info)
         except Exception as err:  # pylint: disable=W0703
             log.info("######### listen topology error #########")
             log.info(err)
