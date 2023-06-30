@@ -218,6 +218,7 @@ setup(name=f'kytos_{NAPP_NAME}',
               'tox',
           ],
       },
+      packages=[],
       cmdclass={
           'clean': Cleaner,
           'ci': CITest,
