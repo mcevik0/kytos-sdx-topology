@@ -44,19 +44,30 @@ class Main(KytosNApp):  # pylint: disable=R0904
 
 
     @listen_to("kytos/topology.*")
-    def listen_topology(self, event=None):  # pylint: disable=W0613
+    def listen_topology(self, event=None):  # pylint: disable=no-self-use
         """ Function meant for listen topology """
-        log.info("######### listen topology #########")
-        self.event_info = {} # pylint: disable=W0201
-        try:
-            topology = requests.get(settings.KYTOS_TOPOLOGY_URL).json()
-            self.event_info = {"event": event, "topology": topology} # pylint: disable=W0201
-            requests.post(settings.SDX_CONSTRUCTOR).json(self.event_info)
-        except Exception as err:  # pylint: disable=W0703
-            log.info("######### listen topology error #########")
-            log.info(err)
-        log.info(self.event_info)
-        return self.event_info
+        log.info("######### listen topology get kytos topology #########")
+        event_info = {} # pylint: disable=W0201
+        if event:
+            allowed_events = [
+                    "kytos/topology.switch.enabled",
+                    "kytos/topology.switch.disabled",
+                    "kytos/topology.link_up",
+                    "kytos/topology.link_down"]
+            if event.name in allowed_events:
+                try:
+                    topology = requests.get(settings.KYTOS_TOPOLOGY_URL).json()
+                    log.info("######### listen topology constructor post request #########")
+                    event_info = {"event": event, "kytostopology": topology} # pylint: disable=W0201
+                    try:
+                        requests.post(settings.SDX_CONSTRUCTOR).json(event_info)
+                    except Exception as err:  # pylint: disable=W0703
+                        log.info("######### constructor post error #########")
+                        log.info(err, event_info)
+                except Exception as err:  # pylint: disable=W0703
+                    log.info("######### listen topology get kytos topology  error #########")
+                    log.info(err)
+        return event_info
 
     @rest("v2/listen_topology", methods=["GET"])
     def get_listen_topology(self):
