@@ -1,7 +1,0 @@
-{
-  "url": "http://0.0.0.0:8080/sdx/v2/",
-  "headers": {
-    "Content-type": "application/json"
-  },
-  "payload": {}
-}
