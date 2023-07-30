@@ -14,22 +14,22 @@ from setuptools import Command, setup
 from setuptools.command.develop import develop
 from setuptools.command.install import install
 
-if 'bdist_wheel' in sys.argv:
+if "bdist_wheel" in sys.argv:
     raise RuntimeError("This setup.py does not support wheels")
 
 # Paths setup with virtualenv detection
-BASE_ENV = Path(os.environ.get('VIRTUAL_ENV', '/'))
+BASE_ENV = Path(os.environ.get("VIRTUAL_ENV", "/"))
 
-NAPP_NAME = 'sdx_topology'
-NAPP_VERSION = '0.1'
+NAPP_NAME = "sdx_topology"
+NAPP_VERSION = "0.1"
 
 # Kytos var folder
-VAR_PATH = BASE_ENV / 'var' / 'lib' / 'kytos'
+VAR_PATH = BASE_ENV / "var" / "lib" / "kytos"
 # Path for enabled NApps
-ENABLED_PATH = VAR_PATH / 'napps'
+ENABLED_PATH = VAR_PATH / "napps"
 # Path to install NApps
-INSTALLED_PATH = VAR_PATH / 'napps' / '.installed'
-CURRENT_DIR = Path('.').resolve()
+INSTALLED_PATH = VAR_PATH / "napps" / ".installed"
+CURRENT_DIR = Path(".").resolve()
 
 # NApps enabled by default
 CORE_NAPPS = []
@@ -57,47 +57,46 @@ class SimpleCommand(Command):
 class Cleaner(SimpleCommand):
     """Custom clean command to tidy up the project root."""
 
-    description = 'clean build, dist, pyc and egg from package and docs'
+    description = "clean build, dist, pyc and egg from package and docs"
 
     def run(self):
         """Clean build, dist, pyc and egg from package and docs."""
-        call('rm -vrf ./build ./dist ./*.egg-info', shell=True)
-        call('find . -name __pycache__ -type d | xargs rm -rf', shell=True)
-        call('make -C docs/ clean', shell=True)
+        call("rm -vrf ./build ./dist ./*.egg-info", shell=True)
+        call("find . -name __pycache__ -type d | xargs rm -rf", shell=True)
+        call("make -C docs/ clean", shell=True)
 
 
 class TestCoverage(SimpleCommand):
     """Display test coverage."""
 
-    description = 'run unit tests and display code coverage'
+    description = "run unit tests and display code coverage"
 
     def run(self):
         """Run unittest quietly and display coverage report."""
-        cmd = 'coverage3 run -m unittest && coverage3 report'
+        cmd = "coverage3 run -m unittest && coverage3 report"
         call(cmd, shell=True)
 
 
 class Linter(SimpleCommand):
     """Code linters."""
 
-    description = 'lint Python source code'
+    description = "lint Python source code"
 
     def run(self):
         """Run yala."""
-        print('Yala is running. It may take several seconds...')
-        check_call('yala *.py', shell=True)
+        print("Yala is running. It may take several seconds...")
+        check_call("yala *.py", shell=True)
 
 
 class CITest(SimpleCommand):
     """Run all CI tests."""
 
-    description = 'run all CI tests: unit and doc tests, linter'
+    description = "run all CI tests: unit and doc tests, linter"
 
     def run(self):
         """Run unit tests with coverage, doc tests and linter."""
-        cmds = ['python3 setup.py ' + cmd
-                for cmd in ('coverage', 'lint')]
-        cmd = ' && '.join(cmds)
+        cmds = ["python3 setup.py " + cmd for cmd in ("coverage", "lint")]
+        cmd = " && ".join(cmds)
         check_call(cmd, shell=True)
 
 
@@ -107,9 +106,9 @@ class KytosInstall:
     @staticmethod
     def enable_core_napps():
         """Enable a NAPP by creating a symlink."""
-        (ENABLED_PATH / 'kytos').mkdir(parents=True, exist_ok=True)
+        (ENABLED_PATH / "kytos").mkdir(parents=True, exist_ok=True)
         for napp in CORE_NAPPS:
-            napp_path = Path('kytos', napp)
+            napp_path = Path("kytos", napp)
             src = ENABLED_PATH / napp_path
             dst = INSTALLED_PATH / napp_path
             symlink_if_different(src, dst)
@@ -118,31 +117,30 @@ class KytosInstall:
 class InstallMode(install):
     """Class used to overwrite the default installation using setuptools."""
 
-
     def run(self):
         """Install the package in install mode.
 
         super().run() does not install dependencies when running
         ``python setup.py install`` (pypa/setuptools#456).
         """
-        print(f'Installing NApp kytos/sdx...')
+        print(f"Installing NApp kytos/sdx...")
         install_path = Path(INSTALLED_PATH)
 
         if not install_path.exists():
             # Create '.installed' dir if installing the first NApp in Kytos
             install_path.mkdir(parents=True, exist_ok=True)
-        elif (install_path / 'kytos').exists():
+        elif (install_path / "kytos").exists():
             # It cleans an old installation
-            shutil.rmtree(install_path / 'kytos')
+            shutil.rmtree(install_path / "kytos")
 
         # The path where the NApp will be installed
-        napp_path = install_path / 'kytos' / NAPP_NAME
+        napp_path = install_path / "kytos" / NAPP_NAME
 
         src = CURRENT_DIR
         shutil.copytree(src, napp_path)
-        (napp_path.parent / '__init__.py').touch()
+        (napp_path.parent / "__init__.py").touch()
         KytosInstall.enable_core_napps()
-        print('NApp installed.')
+        print("NApp installed.")
 
 
 class DevelopMode(develop):
@@ -152,7 +150,7 @@ class DevelopMode(develop):
     created on the system aiming the current source code.
     """
 
-    description = 'Install NApps in development mode'
+    description = "Install NApps in development mode"
 
     def run(self):
         """Install the package in a developer mode."""
@@ -171,21 +169,21 @@ class DevelopMode(develop):
         ./napps/kytos/napp_name will generate a link in
         var/lib/kytos/napps/.installed/kytos/napp_name.
         """
-        links = INSTALLED_PATH / 'kytos'
+        links = INSTALLED_PATH / "kytos"
         links.mkdir(parents=True, exist_ok=True)
         code = CURRENT_DIR
         src = links / NAPP_NAME
         symlink_if_different(src, code)
 
-        (ENABLED_PATH / 'kytos').mkdir(parents=True, exist_ok=True)
-        dst = ENABLED_PATH / Path('kytos', NAPP_NAME)
+        (ENABLED_PATH / "kytos").mkdir(parents=True, exist_ok=True)
+        dst = ENABLED_PATH / Path("kytos", NAPP_NAME)
         symlink_if_different(dst, src)
 
     @staticmethod
     def _create_file_symlinks():
         """Symlink to required files."""
-        src = ENABLED_PATH / '__init__.py'
-        dst = CURRENT_DIR / 'kytos' / '__init__.py'
+        src = ENABLED_PATH / "__init__.py"
+        dst = CURRENT_DIR / "kytos" / "__init__.py"
         symlink_if_different(src, dst)
 
 
@@ -202,34 +200,37 @@ def symlink_if_different(path, target):
         path.symlink_to(target)
 
 
-setup(name=f'kytos_{NAPP_NAME}',
-      version=NAPP_VERSION,
-      description='Core NApps developed by the Kytos Team',
-      url=f'http://github.com/kytos/{NAPP_NAME}',
-      author='Kytos Team',
-      author_email='of-ng-dev@ncc.unesp.br',
-      license='MIT',
-      install_requires=['setuptools >= 36.0.1'],
-      extras_require={
-          'dev': [
-              'coverage',
-              'pip-tools',
-              'yala',
-              'tox',
-          ],
-      },
-      cmdclass={
-          'clean': Cleaner,
-          'ci': CITest,
-          'coverage': TestCoverage,
-          'develop': DevelopMode,
-          'install': InstallMode,
-          'lint': Linter,
-      },
-      zip_safe=False,
-      classifiers=[
-          'License :: OSI Approved :: MIT License',
-          'Operating System :: POSIX :: Linux',
-          'Programming Language :: Python :: 3',
-          'Topic :: System :: Networking',
-      ])
+setup(
+    name=f"kytos_{NAPP_NAME}",
+    version=NAPP_VERSION,
+    description="Core NApps developed by the Kytos Team",
+    url=f"http://github.com/kytos/{NAPP_NAME}",
+    author="Kytos Team",
+    author_email="of-ng-dev@ncc.unesp.br",
+    license="MIT",
+    install_requires=["setuptools >= 36.0.1"],
+    extras_require={
+        "dev": [
+            "coverage",
+            "pip-tools",
+            "yala",
+            "tox",
+        ],
+    },
+    packages=[],
+    cmdclass={
+        "clean": Cleaner,
+        "ci": CITest,
+        "coverage": TestCoverage,
+        "develop": DevelopMode,
+        "install": InstallMode,
+        "lint": Linter,
+    },
+    zip_safe=False,
+    classifiers=[
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python :: 3",
+        "Topic :: System :: Networking",
+    ],
+)

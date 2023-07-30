@@ -3,11 +3,11 @@
 KYTOS_TOPOLOGY = "http://0.0.0.0:8181/api/kytos/topology/v3/"
 KYTOS_SDX_TOPOLOGY_API = \
         "http://0.0.0.0:8181/api/kytos/sdx_topology/v1"
-KYTOS_SDX_CONSTRUCTOR = \
+KYTOS_SDX_TOPOLOGY = \
         "http://0.0.0.0:8181/api/kytos/sdx_topology/v1/topology"
 KYTOS_SDX_VALIDATE = \
         "http://0.0.0.0:8181/api/kytos/sdx_topology/v1/validate"
-SDX_TOPOLOGY = "http://0.0.0.0:8080/sdx-lc/v2/topology"
+SDX_LC_TOPOLOGY = "http://0.0.0.0:8080/sdx-lc/v2/topology"
 HEADERS = {"Content-type": "application/json"}
 ADMIN_EVENTS = [
         "kytos/topology.switch.enabled",

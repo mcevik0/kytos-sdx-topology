@@ -247,7 +247,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     json=topology_dict)
                 if validate_topology.status_code == 200:
                     requests.post(
-                            settings.SDX_TOPOLOGY,
+                            settings.SDX_LC_TOPOLOGY,
                             timeout=10,
                             json=topology_dict)
                     return (topology_dict, 200)
