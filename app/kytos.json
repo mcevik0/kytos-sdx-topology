@@ -2,7 +2,7 @@
   "author": "kytos",
   "username": "kytos",
   "name": "sdx_topology",
-  "description": "SDX API",
+  "description": "Amlight SDX Topology API",
   "version": "2.0",
   "napp_dependencies": ["kytos/topology", "kytos/storehouse"],
   "license": "",
