@@ -3,9 +3,9 @@
   "username": "kytos",
   "name": "sdx_topology",
   "description": "SDX API",
-  "version": "1.0",
+  "version": "2.0",
   "napp_dependencies": ["kytos/topology", "kytos/storehouse"],
   "license": "",
   "tags": [],
-  "url": ""
+  "url": "https://github.com/atlanticwave-sdx/kytos-sdx-topology"
 }
