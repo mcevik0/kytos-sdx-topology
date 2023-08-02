@@ -20,6 +20,5 @@ ADMIN_EVENTS = [
         "kytos/topology.link.metadata.removed",
         ]
 OPERATIONAL_EVENTS = [
-        "kytos.topology.updated",
         "kytos/topology.link_up",
         "kytos/topology.link_down"]
