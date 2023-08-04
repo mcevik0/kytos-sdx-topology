@@ -6,7 +6,7 @@ SDX API
 import secrets
 
 
-class ParseTopology:
+class ParseConvertTopology:
     """Parse Topology  class of kytos/sdx_topology NApp."""
 
     def __init__(self, **args):
@@ -312,7 +312,7 @@ class ParseTopology:
                         del sdx_link
         return sdx_links
 
-    def get_sdx_topology(self):
+    def parse_convert_topology(self):
         """ function get_sdx_topology """
         topology = {}
         topology["name"] = self.oxp_name

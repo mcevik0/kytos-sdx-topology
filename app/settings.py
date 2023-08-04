@@ -18,7 +18,23 @@ ADMIN_EVENTS = [
         "kytos/topology.switch.metadata.removed",
         "kytos/topology.interface.metadata.removed",
         "kytos/topology.link.metadata.removed",
+        # 'kytos/topology.notify_link_up_if_status',
+        # 'kytos/core.shutdown',
+        # 'kytos/core.shutdown.kytos/topology',
+        # '.*.topo_controller.upsert_switch',
+        # '.*.of_lldp.network_status.updated',
+        # '.*.switch.interfaces.created',
+        # '.*.topology.switch.interface.created',
+        # '.*.switch.interface.deleted',
+        # '.*.switch.port.created',
+        # 'topology.interruption.start',
+        # 'topology.interruption.end',
         ]
 OPERATIONAL_EVENTS = [
         "kytos/topology.link_up",
-        "kytos/topology.link_down"]
+        "kytos/topology.link_down",
+        # '.*.connection.lost',
+        # '.*.switch.interface.link_down',
+        # '.*.switch.interface.link_up',
+        # '.*.switch.(new|reconnected)'
+        ]
