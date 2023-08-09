@@ -4,258 +4,198 @@
 def topology_mock():
     """ return json data """
     return {
-            "id": "urn:ogf:network:sdx:topology:amlight.net",
+            "id": "urn:sdx:topology:amlight.net",
             "name": "AmLight-OXP",
-            "model_version": "1.0.0",
-            "time_stamp": "2000-01-23T04:56:07+00:00",
             "version": 1,
+            "model_version": "2.0.0",
+            "timestamp": "2023-01-23T04:56:07Z",
             "links": [
                 {
-                    "availability": 56.37376656633328,
-                    "residual_bandwidth": 602746.015561422,
-                    "id": "urn:ogf:network:sdx:link:amlight:B1-B2",
-                    "latency": 146582.15146899645,
                     "name": "amlight:B1-B2",
-                    "packet_loss": 59.621339166831824,
+                    "id": "urn:sdx:link:amlight_internal_BB",
                     "ports": [
-                        {
-                            "id": "urn:sdx:port:amlight.net:B1:2",
-                            "name": "Novi01:2",
-                            "node": "urn:sdx:node:amlight.net:B1",
-                            "short_name": "B1:2",
-                            "label_range": ["100-200", "10001"],
-                            "status": "up"
-                        },
-                        {
-                            "id": "urn:sdx:port:amlight.net:B2:2",
-                            "label_range": ["100-200", "10001"],
-                            "name": "Novi02:2",
-                            "node": "urn:sdx:node:amlight.net:B2",
-                            "short_name": "B2:2",
-                            "status": "up"
-                        }
+                            "urn:sdx:port:amlight.net:B1:2",
+                            "urn:sdx:port:amlight.net:B2:2",
                     ],
-                    "short_name": "Miami-BocaRaton",
-                    "bandwidth": 80083.7389632821
+                    "type": "intra",
+                    "bandwidth": 1250000000,
+                    "residual_bandwidth": 80,
+                    "latency": 25,
+                    "packet_loss": 0.006255,
+                    "availability": 99.5,
+                    "status": "up",
+                    "state": "enabled"
                 },
                 {
-                    "availability": 56.37376656633328,
-                    "residual_bandwidth": 602746.015561422,
-                    "id": "urn:ogf:network:sdx:link:amlight:A1-B1",
-                    "latency": 146582.15146899645,
                     "name": "amlight:A1-B1",
-                    "packet_loss": 59.621339166831824,
+                    "id": "urn:sdx:link:amlight_internal_AB",
                     "ports": [
-                        {
-                            "id": "urn:sdx:port:amlight.net:A1:1",
-                            "label_range": ["100-200", "1000"],
-                            "name": "Novi100:1",
-                            "node": "urn:sdx:node:amlight.net:A1",
-                            "short_name": "A1:1",
-                            "status": "up"
-                        },
-                        {
-                            "id": "urn:sdx:port:amlight.net:B1:3",
-                            "name": "Novi01:3",
-                            "node": "urn:sdx:node:amlight.net:B1",
-                            "short_name": "B1:3",
-                            "label_range": ["100-200", "10001"],
-                            "status": "up"
-                        }
+                            "urn:sdx:port:amlight.net:A1:1",
+                            "urn:sdx:port:amlight.net:B1:3",
                     ],
-                    "short_name": "redclara-miami",
-                    "bandwidth": 80083.7389632821
+                    "type": "intra",
+                    "bandwidth": 1250000000,
+                    "residual_bandwidth": 31,
+                    "latency": 16,
+                    "packet_loss": 0.0029453,
+                    "availability": 99.5,
+                    "status": "up",
+                    "state": "enabled"
                 },
                 {
-                    "availability": 56.37376656633328,
-                    "residual_bandwidth": 602746.015561422,
-                    "id": "urn:ogf:network:sdx:link:amlight:A1-B2",
-                    "latency": 146582.15146899645,
                     "name": "amlight:A1-B2",
-                    "packet_loss": 59.621339166831824,
+                    "id": "urn:sdx:link:amlight_internal_BA",
                     "ports": [
-                        {
-                            "id": "urn:sdx:port:amlight.net:A1:2",
-                            "label_range": ["100-200", "1000"],
-                            "name": "Novi100:2",
-                            "node": "urn:sdx:node:amlight.net:A1",
-                            "short_name": "A1:2",
-                            "status": "up"
-                        },
-                        {
-                            "id": "urn:sdx:port:amlight.net:B2:3",
-                            "label_range": ["100-200", "10001"],
-                            "name": "Novi02:3",
-                            "node": "urn:sdx:node:amlight.net:B2",
-                            "short_name": "B2:3",
-                            "status": "up"
-                        }
+                            "urn:sdx:port:amlight.net:A1:2",
+                            "urn:sdx:port:amlight.net:B2:3",
                     ],
-                    "short_name": "redclara-BocaRaton",
-                    "bandwidth": 80083.7389632821
+                    "type": "intra",
+                    "bandwidth": 1250000000,
+                    "residual_bandwidth": 80,
+                    "latency": 25,
+                    "packet_loss": 0.006255,
+                    "availability": 99.5,
+                    "status": "up",
+                    "state": "enabled"
                 },
                 {
-                    "availability": 56.37376656633328,
-                    "residual_bandwidth": 602746.015561422,
-                    "id": "urn:ogf:network:sdx:link:nni:Miami-Sanpaolo",
-                    "latency": 146582.15146899645,
                     "name": "nni:Miami-Sanpaolo",
-                    "packet_loss": 59.621339166831824,
-                    "nni": "True",
+                    "id": "urn:sdx:link:nni_Miami-Sanpaolo",
                     "ports": [
-                        {
-                            "id": "urn:sdx:port:amlight:B1:1",
-                            "name": "Novi01:1",
-                            "node": "urn:sdx:node:amlight.net:B1",
-                            "short_name": "B1:1",
-                            "label_range": ["100-200", "10001"],
-                            "status": "up"
-                        },
-                        {
-                            "id": "urn:ogf:network:sdx:port:sax:B1:1",
-                            "name": "Novi01:1",
-                            "node": "urn:ogf:network:sdx:port:sax:B1",
-                            "short_name": "B1:1",
-                            "label_range": ["100-200", "10001"],
-                            "status": "up"
-                        }
+                            "urn:sdx:port:amlight:B1:1",
+                            "urn:sdx:port:sax:B1:1",
                     ],
-                    "short_name": "Miami-Sanpaolo",
-                    "bandwidth": 80083.7389632821
+                    "type": "intra",
+                    "bandwidth": 1250000000,
+                    "residual_bandwidth": 31,
+                    "latency": 16,
+                    "packet_loss": 0.0029453,
+                    "availability": 99.5,
+                    "status": "up",
+                    "state": "enabled"
                 },
-                {
-                    "availability": 56.37376656633328,
-                    "residual_bandwidth": 602746.015561422,
-                    "id": "urn:ogf:network:sdx:link:nni:BocaRaton-Fortaleza",
-                    "latency": 146582.15146899645,
-                    "name": "nni:BocaRaton-Fortaleza",
-                    "packet_loss": 59.621339166831824,
-                    "nni": "True",
-                    "ports": [
-                        {
-                            "id": "urn:sdx:port:amlight.net:B2:1",
-                            "label_range": ["100-200", "1000"],
-                            "name": "Novi02:1",
-                            "node": "urn:sdx:node:amlight.net:B2",
-                            "short_name": "B2:1",
-                            "status": "up"
-                        },
-                        {
-                            "id": "urn:ogf:network:sdx:port:sax:B2:1",
-                            "label_range": ["100-200", "1000"],
-                            "name": "Novi02:1",
-                            "node": "urn:ogf:network:sdx:node:sax:B2",
-                            "short_name": "B2:1",
-                            "status": "up"
-                        }
-                    ],
-                    "short_name": "BocaRaton-Fortaleza",
-                    "bandwidth": 80083.7389632821
-                }
             ],
             "nodes": [
                 {
+                    "name": "amlight_Novi01",
                     "id": "urn:sdx:node:amlight.net:B1",
                     "location": {
                         "address": "Miami",
                         "latitude": 25.75633040531146,
                         "longitude": -80.37676058477908
                     },
-                    "name": "amlight:Novi01",
                     "ports": [
                         {
                             "id": "urn:sdx:port:amlight:B1:1",
-                            "name": "Novi01:1",
+                            "name": "Novi01_1",
                             "node": "urn:sdx:node:amlight.net:B1",
-                            "short_name": "B1:1",
-                            "label_range": ["100-200", "10001"],
-                            "status": "up"
+                            "type": "10GE",
+                            "status": "up",
+                            "state": "enabled",
+                            "services": "l2vpn",
+                            "nni": "False",
+                            "mtu": 9000
                         },
                         {
                             "id": "urn:sdx:port:amlight.net:B1:2",
-                            "name": "Novi01:2",
+                            "name": "Novi01_2",
                             "node": "urn:sdx:node:amlight.net:B1",
-                            "short_name": "B1:2",
-                            "label_range": ["100-200", "10001"],
-                            "status": "up"
+                            "type": "25GE",
+                            "status": "up",
+                            "state": "enabled",
+                            "services": "l2vpn",
+                            "nni": "False",
+                            "mtu": 9000
                         },
                         {
                             "id": "urn:sdx:port:amlight.net:B1:3",
-                            "name": "Novi01:3",
+                            "name": "Novi01_3",
                             "node": "urn:sdx:node:amlight.net:B1",
-                            "short_name": "B1:3",
-                            "label_range": ["100-200", "10001"],
-                            "status": "up"
+                            "type": "40GE",
+                            "status": "up",
+                            "state": "enabled",
+                            "services": "l2vpn",
+                            "nni": "False",
+                            "mtu": 9000
                         }
                     ],
-                    "short_name": "B1"
                 },
                 {
+                    "name": "amlight_Novi02",
                     "id": "urn:sdx:node:amlight.net:B2",
                     "location": {
                         "address": "BocaRaton",
                         "latitude": 26.381437356374075,
                         "longitude": -80.10225977485742
                     },
-                    "name": "amlight:Novi02",
                     "ports": [
                         {
                             "id": "urn:sdx:port:amlight.net:B2:1",
-                            "label_range": ["100-200", "1000"],
-                            "name": "Novi02:1",
+                            "name": "Novi02_1",
                             "node": "urn:sdx:node:amlight.net:B2",
-                            "short_name": "B2:1",
-                            "status": "up"
+                            "type": "50GE",
+                            "status": "up",
+                            "state": "enabled",
+                            "services": "l2vpn",
+                            "nni": "False",
+                            "mtu": 9000
                         },
                         {
                             "id": "urn:sdx:port:amlight.net:B2:2",
-                            "label_range": ["100-200", "10001"],
-                            "name": "Novi02:2",
+                            "name": "Novi02_2",
                             "node": "urn:sdx:node:amlight.net:B2",
-                            "short_name": "B2:2",
-                            "status": "up"
+                            "type": "100GE",
+                            "status": "up",
+                            "state": "enabled",
+                            "services": "l2vpn",
+                            "nni": "False",
+                            "mtu": 9000
                         },
                         {
                             "id": "urn:sdx:port:amlight.net:B2:3",
-                            "label_range": ["100-200", "10001"],
-                            "name": "Novi02:3",
+                            "name": "Novi02_3",
                             "node": "urn:sdx:node:amlight.net:B2",
-                            "short_name": "B2:3",
-                            "status": "up"
+                            "type": "400GE",
+                            "status": "up",
+                            "state": "enabled",
+                            "services": "l2vpn",
+                            "nni": "False",
+                            "mtu": 9000
                         }
                     ],
-                    "short_name": "B2"
                 },
                 {
+                    "name": "amlight_Novi100",
                     "id": "urn:sdx:node:amlight.net:A1",
                     "location": {
                         "address": "redclara",
                         "latitude": 30.34943181039702,
                         "longitude": -81.66666016473143
                     },
-                    "name": "amlight:Novi100",
                     "ports": [
                         {
                             "id": "urn:sdx:port:amlight.net:A1:1",
-                            "label_range": ["100-200", "1000"],
-                            "name": "Novi100:1",
+                            "name": "Novi100_1",
                             "node": "urn:sdx:node:amlight.net:A1",
-                            "short_name": "A1:1",
-                            "status": "up"
+                            "type": "10GE",
+                            "status": "up",
+                            "state": "enabled",
+                            "services": "l2vpn",
+                            "nni": "False",
+                            "mtu": 9000
                         },
                         {
                             "id": "urn:sdx:port:amlight.net:A1:2",
-                            "label_range": ["100-200", "1000"],
-                            "name": "Novi100:2",
+                            "name": "Novi100_2",
                             "node": "urn:sdx:node:amlight.net:A1",
-                            "short_name": "A1:2",
-                            "status": "up"
+                            "type": "25GE",
+                            "status": "up",
+                            "state": "enabled",
+                            "services": "l2vpn",
+                            "nni": "False",
+                            "mtu": 9000
                         }
                     ],
-                    "short_name": "A1"
                 }
             ],
-            "domain_service": {
-                "owner": "FIU"
-            }
         }

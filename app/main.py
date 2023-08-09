@@ -4,13 +4,9 @@ Main module of amlight/sdx Kytos Network Application.
 import os
 import shelve
 import requests
-from flask import request, jsonify
-from werkzeug.exceptions import BadRequest
 from napps.kytos.sdx_topology.convert_topology import (
         ParseConvertTopology)  # pylint: disable=E0401
 from napps.kytos.sdx_topology import settings, utils, topology_mock \
-        # pylint: disable=E0401
-from napps.kytos.topology.main import Main as KytosTopologyMain \
         # pylint: disable=E0401
 
 from kytos.core import KytosNApp, log, rest
@@ -84,11 +80,31 @@ class Main(KytosNApp):  # pylint: disable=R0904
 
     def validate_sdx_topology(self, sdx_topology):
         """ return 200 if validated topology following the SDX data model"""
-        validate_topology = requests.post(
-                settings.SDX_TOPOLOGY_VALIDATE,
-                timeout=10,
-                json=sdx_topology)
-        return validate_topology
+        f_name = " validate_sdx_topology "
+        log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
+        log.info(f"{HSH}{f_name}{HSH}")
+        log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
+        log.info(f"{HSH} sdx_topology: {sdx_topology}{HSH}")
+        log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
+        try:
+            response = requests.post(
+                    settings.SDX_TOPOLOGY_VALIDATE,
+                    json=sdx_topology,
+                    timeout=10)
+        except ValueError as exception:
+            log.info("validate topology result %s %s", exception, 401)
+            raise HTTPException(
+                    401,
+                    detail=f"Path is not valid: {exception}"
+                ) from exception
+        log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
+        log.info(f"{HSH} validate_sdx_topology response: {response}{HSH}")
+        log.info(f"{HSH} validate_sdx_topology response.json: \
+                {response.json()}{HSH}")
+        log.info(f"{HSH} validate_sdx_topology response.status: \
+                {response.status_code}{HSH}")
+        log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
+        return {"result": response.json(), "status_code": response.status_code}
 
     def convert_topology(self, event_type=0, event_timestamp=None):
         """Function that will take care of update the shelve containing
@@ -121,6 +137,10 @@ class Main(KytosNApp):  # pylint: disable=R0904
 
     def post_sdx_topology(self, event_type=0, event_timestamp=None):
         """ return the topology following the SDX data model"""
+        f_name = " post_sdx_topology "
+        log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
+        log.info(f"{HSH}{f_name}{HSH}")
+        log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
         try:
             if event_type != 0:
                 topology_update = self.convert_topology(
@@ -136,8 +156,8 @@ class Main(KytosNApp):  # pylint: disable=R0904
                         }
             else:
                 sdx_topology = topology_mock.topology_mock()
-            evaluate_topology = self.validate_topology()
-            if evaluate_topology.status_code == 200:
+            evaluate_topology = self.validate_sdx_topology(sdx_topology)
+            if evaluate_topology["status_code"] == 200:
                 post_topology = requests.post(
                         settings.SDX_LC_TOPOLOGY,
                         timeout=10,
@@ -155,7 +175,8 @@ class Main(KytosNApp):  # pylint: disable=R0904
                             open_shelve.close()
                     return (sdx_topology, 200)
                 return (post_topology.json(), 400)
-            return (evaluate_topology.json(), 400)
+            return (evaluate_topology["result"],
+                    evaluate_topology["status_code"])
         except Exception as err:  # pylint: disable=W0703
             log.debug(err)
         return ("No SDX Topology loaded", 401)
@@ -215,29 +236,65 @@ class Main(KytosNApp):  # pylint: disable=R0904
 
     # rest api tests
 
-    @rest("v1/validate_sdx_topology")
-    def get_validate_sdx_topology(self, sdx_topology):
+    @rest("v1/validate_sdx_topology", methods=["POST"])
+    def get_validate_sdx_topology(self, request: Request) -> JSONResponse:
         """ REST to return the validated sdx topology status"""
-        return self.validate_sdx_topology(sdx_topology)
+        f_name = " get_validate_sdx_topology "
+        log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
+        log.info(f"{HSH}{f_name}{HSH}")
+        log.info(f"request: {request}")
+        log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
+        content = get_json_or_400(request, self.controller.loop)
+        sdx_topology = content.get("sdx_topology")
+        f_name = " get_json_or_400: "
+        log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
+        log.info(f"{HSH}{f_name} content: {content} \
+                sdx_topology: {sdx_topology} {HSH}")
+        log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
+        if sdx_topology is None:
+            sdx_topology = topology_mock.topology_mock()
+            f_name = " sdx_topology is None "
+            log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
+            log.info(f"{HSH}{f_name}{HSH}")
+            # log.info(f"sdx_topology: {sdx_topology}")
+            log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
+        response = self.validate_sdx_topology(sdx_topology)
+        result = response["result"]
+        status_code = response["status_code"]
+        log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
+        f_name = " get_validate_sdx_topology response "
+        log.info(f"{HSH}{f_name}{HSH}")
+        log.info(f"response: {response}")
+        log.info(f"result: {result}")
+        log.info(f"status: {status_code}")
+        log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
+        return JSONResponse(result, status_code)
 
-    @rest("v1/convert_topology")
-    def get_converted_topology(self, event_type=0, event_timestamp=None):
+    @rest("v1/convert_topology/{event_type}/{event_timestamp}")
+    def get_converted_topology(self, request: Request) -> JSONResponse:
         """ REST to return the converted sdx topology"""
+        event_type = request.path_params.get("event_type")
+        event_timestamp = request.path_params.get("event_timestamp")
         return self.convert_topology(event_type, event_timestamp)
 
-    @rest("v1/sdx_topology")
-    def get_sdx_topology(self, event_type=0, event_timestamp=None):
+    @rest("v1/sdx_topology/{event_type}/{event_timestamp}")
+    def get_sdx_topology(self, request: Request) -> JSONResponse:
         """ REST to return the sdx topology loaded"""
+        event_type = request.path_params.get("event_type")
+        event_timestamp = request.path_params.get("event_timestamp")
         return self.post_sdx_topology(event_type, event_timestamp)
 
     @rest("v1/listen_event", methods=["POST"])
-    def get_listen_event(self, _request: Request) -> JSONResponse:
+    def get_listen_event(self, request: Request) -> JSONResponse:
         """consume call listen Event"""
         f_name = " get_listen_event "
         log.debug(f"{HSH}{f_name}{HSH}")
         try:
+            result = get_json_or_400(request, self.controller.loop)
+            name = result.get("name")
+            content = result.get("content")
             event = KytosEvent(
-                    name=request.name, content=request.content)
+                    name=name, content=content)
             # self.controller.buffers.app.put(event)
             sdx_topology = self.listen_event(event)
             return JSONResponse({"sdx_topology": sdx_topology})
