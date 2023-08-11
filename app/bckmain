@@ -131,10 +131,11 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     oxp_name=self.dict_shelve['oxp_name'],
                     oxp_url=self.dict_shelve['oxp_url'],
                 ).parse_convert_topology()
-            return topology_mock.topology_mock()
+            return {"result": topology_mock.topology_mock(),
+                    "status_code": 200}
         except Exception as err:  # pylint: disable=W0703
             log.info(err)
-            return ("Validation Error", 400)
+            return {"result": "Validation Error", "status_code": 400}
 
     def post_sdx_lc(self, event_type):
         """ return the status from post sdx topology to sdx lc"""
@@ -145,14 +146,12 @@ class Main(KytosNApp):  # pylint: disable=R0904
                 settings.SDX_LC_TOPOLOGY,
                 timeout=10,
                 json=self.sdx_topology)
-        log.info(f"post_topology: {post_topology}")
-        log.info(f"{HSH} dir(post_topology): {dir(post_topology)} {HSH}")
         log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
-        log.info(f"result: {post_topology['result']}")
+        log.info(f"json: {post_topology.json()}")
         log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
-        log.info(f"status: {post_topology['status_code']}")
+        log.info(f"status: {post_topology.status_code}")
         log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
-        if post_topology["status_code"] == 200:
+        if post_topology.status_code == 200:
             if event_type != 0:
                 # open the topology shelve
                 with shelve.open("topology_shelve") as open_shelve:
@@ -165,11 +164,13 @@ class Main(KytosNApp):  # pylint: disable=R0904
             log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
             f_name = " post_sdx_topology return sdx_topology 200 "
             log.info(f"{HSH}{f_name}{HSH}")
-            return (self.sdx_topology, 200)
+            return {"result": self.sdx_topology,
+                    "status_code": post_topology.status_code}
         log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
         f_name = " post_sdx_topology return post_topology 400 "
         log.info(f"{HSH}{f_name}{HSH}")
-        return (post_topology.json(), 400)
+        return {"result": post_topology.json(),
+                "status_code": post_topology.status_code}
 
     def post_sdx_topology(self, event_type=0, event_timestamp=None):
         """ return the topology following the SDX data model"""
@@ -196,6 +197,10 @@ class Main(KytosNApp):  # pylint: disable=R0904
             evaluate_topology = self.validate_sdx_topology()
             if evaluate_topology["status_code"] == 200:
                 result = self.post_sdx_lc(event_type)
+                log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
+                f_name = " post_sdx_topology result "
+                log.info(f"{HSH}{f_name}{HSH}")
+                log.info(f"{HSH}{result}{HSH}")
                 return result
             log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
             f_name = " post_sdx_topology return post_topology not valid "
@@ -204,7 +209,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     "status_code": evaluate_topology['status_code']}
         except Exception as err:  # pylint: disable=W0703
             log.info(err)
-        return ("No SDX Topology loaded", 401)
+        return {"result": "No SDX Topology loaded", "status_code": 401}
 
     @listen_to("kytos/topology.*")
     def listen_event(self, event=None):
@@ -270,6 +275,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
     @rest("v1/validate_sdx_topology", methods=["POST"])
     def get_validate_sdx_topology(self, request: Request) -> JSONResponse:
         """ REST to return the validated sdx topology status"""
+        # pylint: disable=W0201
         f_name = " get_validate_sdx_topology "
         log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
         log.info(f"{HSH}{f_name}{HSH}")
@@ -280,9 +286,9 @@ class Main(KytosNApp):  # pylint: disable=R0904
         f_name = " get_json_or_400: "
         log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
         log.info(f"{HSH}{f_name} content: {content} \
-                sdx_topology: {sdx_topology} {HSH}")
+                sdx_topology: {self.sdx_topology} {HSH}")
         log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
-        if sdx_topology is None:
+        if self.sdx_topology is None:
             self.sdx_topology = topology_mock.topology_mock()
             f_name = " sdx_topology is None "
             log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
@@ -313,7 +319,17 @@ class Main(KytosNApp):  # pylint: disable=R0904
         log.info(f"{HSH}event_type: {event_type}{HSH}")
         log.info(f"{HSH}event_timestamp: {event_timestamp}{HSH}")
         log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
-        return self.convert_topology(event_type, event_timestamp)
+        response = self.convert_topology(event_type, event_timestamp)
+        result = response["result"]
+        status_code = response["status_code"]
+        log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
+        f_name = " get_converted_topology response "
+        log.info(f"{HSH}{f_name}{HSH}")
+        log.info(f"response: {response}")
+        log.info(f"result: {result}")
+        log.info(f"status: {status_code}")
+        log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
+        return JSONResponse(result, status_code)
 
     @rest("v1/post_sdx_topology/{event_type}/{event_timestamp}")
     def get_sdx_topology(self, request: Request) -> JSONResponse:
@@ -328,7 +344,17 @@ class Main(KytosNApp):  # pylint: disable=R0904
         log.info(f"{HSH}event_type: {event_type}{HSH}")
         log.info(f"{HSH}event_timestamp: {event_timestamp}{HSH}")
         log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
-        return self.post_sdx_topology(event_type, event_timestamp)
+        response = self.post_sdx_topology(event_type, event_timestamp)
+        result = response["result"]
+        status_code = response["status_code"]
+        log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
+        f_name = " get_sdx_topology response "
+        log.info(f"{HSH}{f_name}{HSH}")
+        log.info(f"response: {response}")
+        log.info(f"result: {result}")
+        log.info(f"status: {status_code}")
+        log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
+        return JSONResponse(result, status_code)
 
     @rest("v1/listen_event", methods=["POST"])
     def get_listen_event(self, request: Request) -> JSONResponse:
