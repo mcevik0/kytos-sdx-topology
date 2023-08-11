@@ -11,7 +11,7 @@ def topology_mock():
             "timestamp": "2023-01-23T04:56:07Z",
             "links": [
                 {
-                    "name": "amlight:B1-B2",
+                    "name": "amlight_B1B2",
                     "id": "urn:sdx:link:amlight_internal_BB",
                     "ports": [
                             "urn:sdx:port:amlight.net:B1:2",
@@ -27,7 +27,7 @@ def topology_mock():
                     "state": "enabled"
                 },
                 {
-                    "name": "amlight:A1-B1",
+                    "name": "amlight_A1B1",
                     "id": "urn:sdx:link:amlight_internal_AB",
                     "ports": [
                             "urn:sdx:port:amlight.net:A1:1",
@@ -43,7 +43,7 @@ def topology_mock():
                     "state": "enabled"
                 },
                 {
-                    "name": "amlight:A1-B2",
+                    "name": "amlight_A1B2",
                     "id": "urn:sdx:link:amlight_internal_BA",
                     "ports": [
                             "urn:sdx:port:amlight.net:A1:2",
@@ -59,8 +59,8 @@ def topology_mock():
                     "state": "enabled"
                 },
                 {
-                    "name": "nni:Miami-Sanpaolo",
-                    "id": "urn:sdx:link:nni_Miami-Sanpaolo",
+                    "name": "nni_MiamiSanpaolo",
+                    "id": "urn:sdx:link:nni_Miami_Sanpaolo",
                     "ports": [
                             "urn:sdx:port:amlight:B1:1",
                             "urn:sdx:port:sax:B1:1",
