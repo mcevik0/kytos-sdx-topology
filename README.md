@@ -9,9 +9,7 @@ Requirements
 
 * kytos/core
 * kytos/topology
-* kytos/storehouse
 * openAPI Specification
-* swagger client
 * flask
 * python 3.9
 
@@ -23,11 +21,18 @@ Preparing the environment:
 Please make sure that you're using python3.9
 
 
-Installing swagger_client
+Installation 
 ==========================
 
-For the whole installation process and requirements, please access
-the AtlanticWave SDX repo in Github: https://github.com/atlanticwave-sdx
+* For the whole installation process and requirements, please access the AtlanticWave SDX repo in Github: https://github.com/atlanticwave-sdx
+
+* The KytoS SDX Topology Napp is pivotal in the Atlantic Wave SDX system, serving as a cornerstone of the system's architecture. Its functionality and contributions are integral to the system's successful operation. 
+
+* It's important to note that this repository functions as a submodule of the principal repository located at https://github.com/atlanticwave-sdx/sdx-continuous-development. 
+
+* The KytoS SDX Topology Napp is installed within the principal repository as part of the seamless integration process. This interconnected setup allows for a cohesive deployment of the entire system, ensuring that the features and capabilities of the Napp are harnessed effectively within the broader context of the Atlantic Wave SDX system. 
+
+* By maintaining this modular structure and close integration, we can harness the full potential of the KytoS SDX Topology Napp while contributing to the overall robustness and functionality of the Atlantic Wave SDX system. 
 
 
 # Test
