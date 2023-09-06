@@ -33,9 +33,6 @@ class Main(KytosNApp):  # pylint: disable=R0904
 
         So, if you have any setup routine, insert it here.
         """
-        log.debug(f"{HSH}{HSH}{HSH}")
-        log.debug(f"{HSH}sdx topology{HSH}")
-        log.debug(f"{HSH}{HSH}{HSH}")
         self.event_info = {}  # pylint: disable=W0201
         self.sdx_topology = {}  # pylint: disable=W0201
         self.shelve_loaded = False  # pylint: disable=W0201
@@ -112,7 +109,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
             return {"result": topology_mock.topology_mock(),
                     "status_code": 200}
         except Exception as err:  # pylint: disable=W0703
-            log.info(err)
+            log.info("validation Error, status code 400:", err)
             return {"result": "Validation Error", "status_code": 400}
 
     def post_sdx_lc(self, event_type):
@@ -161,7 +158,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
             return {"result": evaluate_topology['result'],
                     "status_code": evaluate_topology['status_code']}
         except Exception as err:  # pylint: disable=W0703
-            log.info(err)
+            log.info("No SDX Topology loaded, status_code 401:", err)
         return {"result": "No SDX Topology loaded", "status_code": 401}
 
     @listen_to(
@@ -255,7 +252,6 @@ class Main(KytosNApp):  # pylint: disable=R0904
     def get_listen_event(self, request: Request) -> JSONResponse:
         """consume call listen Event"""
         f_name = " get_listen_event "
-        log.info(f"{HSH}{f_name}{HSH}")
         try:
             result = get_json_or_400(request, self.controller.loop)
             name = result.get("name")
@@ -281,7 +277,6 @@ class Main(KytosNApp):  # pylint: disable=R0904
     def get_shelve_events(self, _request: Request) -> JSONResponse:
         """return events shelve"""
         f_name = " get_shelve_events "
-        log.info(f"{HSH}{f_name}{HSH}")
         with shelve.open("events_shelve") as open_shelve:
             events = open_shelve['events']
         open_shelve.close()
