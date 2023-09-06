@@ -31,6 +31,7 @@ ADMIN_EVENTS = [
         # 'topology.interruption.end',
         ]
 OPERATIONAL_EVENTS = [
+        "topology_loaded",
         "kytos/topology.link_up",
         "kytos/topology.link_down",
         # '.*.connection.lost',

@@ -63,15 +63,6 @@ class Main(KytosNApp):  # pylint: disable=R0904
         call it."""
         self.shelve_loaded = False  # pylint: disable=W0201
 
-    def test_kytos_topology(self):
-        """ Test if the Topology napp has loaded """
-        try:
-            _ = self.get_kytos_topology()
-            return True
-        except Exception as err:  # pylint: disable=W0703
-            log.debug(err)
-            return False
-
     @staticmethod
     def get_kytos_topology():
         """retrieve topology from API"""
@@ -173,17 +164,12 @@ class Main(KytosNApp):  # pylint: disable=R0904
             log.info(err)
         return {"result": "No SDX Topology loaded", "status_code": 401}
 
-    @listen_to("kytos/topology.*")
+    @listen_to(
+            "kytos.topology.updated",
+            "kytos/topology.*",
+            pool="dynamic_single")
     def listen_event(self, event=None):
         """Function meant for listen topology"""
-        f_name = " listen_event "
-        log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
-        log.info(f"{HSH}{f_name} {HSH}")
-        log.info(f"{HSH} dir(event): {dir(event)} {HSH}")
-        log.info(f"{HSH} event: {event} {HSH}")
-        log.info(f"{HSH} event.name: {event.name} {HSH}")
-        log.info(f"{HSH} event.content: {event.content} {HSH}")
-        log.info(f"{HSH}{HSH}{HSH}{HSH}{HSH}")
         if event is not None and self.get_kytos_topology():
             if event.name in settings.ADMIN_EVENTS:
                 event_type = 1
@@ -199,8 +185,6 @@ class Main(KytosNApp):  # pylint: disable=R0904
                 log_events['events'] = shelve_events
                 log_events.close()
             return self.post_sdx_topology(event_type, event.timestamp)
-        log.info(
-                f"{HSH} event:{event}, topology: {self.get_kytos_topology()}")
         return {"event": event, "topology": self.get_kytos_topology()}
 
     def load_shelve(self):  # pylint: disable=W0613

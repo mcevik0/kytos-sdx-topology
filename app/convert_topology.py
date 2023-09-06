@@ -17,67 +17,77 @@ class ParseConvertTopology:
         self.oxp_name = args['oxp_name']
         self.oxp_url = args['oxp_url']
 
-    def get_kytos_nodes(self):
+    def get_kytos_nodes(self) -> dict:
         """ return parse_args["topology"]["switches"] values """
         return self.kytos_topology["switches"].values()
 
-    def get_kytos_links(self):
+    def get_kytos_links(self) -> dict:
         """ return parse_args["topology"]["links"] values """
         return self.kytos_topology["links"].values()
 
     @staticmethod
-    def get_link_port_speed(speed):
+    def get_link_port_speed(speed: str) -> int:
         """Function to obtain the speed of a specific port in the link."""
-        values = [
-            ["400GE", 50000000000, 50000000000.0],
-            ["100GE", 12500000000, 12500000000.0],
-            ["50GE", 6250000000, 6250000000.0],
-            ["40GE", 5000000000, 5000000000.0],
-            ["25GE", 3125000000, 3125000000.0],
-            ["10GE", 1250000000, 1250000000.0],
-        ]
-        return_value = [
-            50000000000,
-            12500000000,
-            6250000000,
-            5000000000,
-            3125000000,
-            1250000000,
-            125000000,
-        ]
-        result = [return_value[x] for x in range(6) if speed in values[x]]
-        if result:
-            return result[0]
-        return 0
+        type_to_speed = {
+                "400GE": 50000000000,
+                "50000000000": 50000000000,
+                "50000000000.0": 50000000000,
+                "100GE": 12500000000,
+                "12500000000": 12500000000,
+                "12500000000.0": 12500000000,
+                "50GE": 6250000000,
+                "6250000000": 6250000000,
+                "6250000000.0": 6250000000,
+                "40GE": 5000000000,
+                "5000000000": 5000000000,
+                "5000000000.0": 5000000000,
+                "25GE": 3125000000,
+                "3125000000": 3125000000,
+                "3125000000.0": 3125000000,
+                "10GE": 1250000000,
+                "1250000000": 1250000000,
+                "1250000000.0": 1250000000,
+        }
+
+        return type_to_speed.get(speed, 0)
 
     @staticmethod
-    def get_type_port_speed(speed):
+    def get_type_port_speed(speed: str) -> str:
         """Function to obtain the speed of a specific port type."""
-        values = [
-            ["400GE", 50000000000, 50000000000.0],
-            ["100GE", 12500000000, 12500000000.0],
-            ["50GE", 6250000000, 6250000000.0],
-            ["40GE", 5000000000, 5000000000.0],
-            ["25GE", 3125000000, 3125000000.0],
-            ["10GE", 1250000000, 1250000000.0],
-        ]
-        return_value = ["400GE", "100GE", "50GE", "40GE", "25GE", "10GE"]
-        result = [return_value[x] for x in range(6) if speed in values[x]]
-        if result:
-            return result[0]
-        return "Other"
+        speed_to_type = {
+                "400GE": "400GE",
+                "50000000000": "400GE",
+                "50000000000.0": "400GE",
+                "100GE": "100GE",
+                "12500000000": "100GE",
+                "12500000000.0": "100GE",
+                "50GE": "50GE",
+                "6250000000": "50GE",
+                "6250000000.0": "50GE",
+                "40GE": "40GE",
+                "5000000000": "40GE",
+                "5000000000.0": "40GE",
+                "25GE": "25GE",
+                "3125000000": "25GE",
+                "3125000000.0": "25GE",
+                "10GE": "10GE",
+                "1250000000": "10GE",
+                "1250000000.0": "10GE",
+        }
+
+        return speed_to_type.get(speed, "Other")
 
     @staticmethod
-    def get_status(status):
+    def get_status(status: bool) -> str:
         """Function to obtain the status."""
         return "up" if status else "down"
 
     @staticmethod
-    def get_state(state):
+    def get_state(state: bool) -> str:
         """Function to obtain the state."""
         return "enabled" if state else "disabled"
 
-    def get_port_urn(self, switch, interface):
+    def get_port_urn(self, switch: str, interface) -> str:
         """function to generate the full urn address for a node"""
 
         if not isinstance(interface, str) and not isinstance(interface, int):
@@ -94,7 +104,7 @@ class ParseConvertTopology:
 
         return f"urn:sdx:port:{self.oxp_url}:{switch_name}:{interface}"
 
-    def get_port(self, sdx_node_name, interface):
+    def get_port(self, sdx_node_name: str, interface: dict) -> dict:
         """Function to retrieve a network device's port (or interface) """
 
         sdx_port = {}
@@ -102,7 +112,7 @@ class ParseConvertTopology:
                 sdx_node_name, interface["port_number"])
         sdx_port["name"] = interface["name"]
         sdx_port["node"] = f"urn:sdx:node:{self.oxp_url}:{sdx_node_name}"
-        sdx_port["type"] = self.get_type_port_speed(interface["speed"])
+        sdx_port["type"] = self.get_type_port_speed(str(interface["speed"]))
         sdx_port["status"] = self.get_status(interface["active"])
         sdx_port["state"] = self.get_state(interface["enabled"])
         sdx_port["services"] = "l2vpn"
@@ -117,7 +127,7 @@ class ParseConvertTopology:
 
         return sdx_port
 
-    def get_ports(self, sdx_node_name, interfaces):
+    def get_ports(self, sdx_node_name: str, interfaces: dict) -> list:
         """Function that calls the main individual get_port function,
         to get a full list of ports from a node/ interface """
         ports = []
@@ -128,7 +138,7 @@ class ParseConvertTopology:
 
         return ports
 
-    def get_kytos_nodes_names(self):
+    def get_kytos_nodes_names(self) -> dict:
         """retrieve the data_path attribute for every Kytos topology switch"""
         nodes_mappings = {}
 
@@ -140,7 +150,7 @@ class ParseConvertTopology:
 
         return nodes_mappings
 
-    def get_sdx_node(self, kytos_node):
+    def get_sdx_node(self, kytos_node: dict) -> dict:
         """function that builds every Node dictionary object with all the
         necessary attributes that make a Node object; the name, id, location
         and list of ports."""
@@ -168,8 +178,8 @@ class ParseConvertTopology:
 
         return sdx_node
 
-    def get_sdx_nodes(self):
-        """returns a SDX Nodes objects list for every Kytos node in topology"""
+    def get_sdx_nodes(self) -> list:
+        """returns SDX Nodes list with every enabled Kytos node in topology"""
         sdx_nodes = []
         for kytos_node in self.get_kytos_nodes():
             if kytos_node["enabled"]:
@@ -226,7 +236,7 @@ class ParseConvertTopology:
             else:
                 if item in ["bandwidth"]:
                     sdx_link[item] = self.get_link_port_speed(
-                            kytos_link["endpoint_a"]["speed"])
+                            str(kytos_link["endpoint_a"]["speed"]))
                 elif item in ["residual_bandwidth", "availability"]:
                     sdx_link[item] = 100
                 else:
@@ -293,7 +303,7 @@ class ParseConvertTopology:
 
                         sdx_link["type"] = "inter"
                         sdx_link["bandwidth"] = self.get_link_port_speed(
-                            kytos_interface["speed"]
+                            str(kytos_interface["speed"])
                         )
                         sdx_link["status"] = (
                             "up" if kytos_interface["active"] else "down"
