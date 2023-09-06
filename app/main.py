@@ -94,7 +94,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
             with shelve.open("topology_shelve") as open_shelve:
                 version = open_shelve['version']
                 self.dict_shelve = dict(open_shelve)  # pylint: disable=W0201
-                open_shelve.close()
+                open_shelve.sync()
             if version >= 1 and event_type != 0:
                 timestamp = utils.get_timestamp()
                 if event_type == 1:
@@ -130,7 +130,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     open_shelve['nodes'] = self.sdx_topology["nodes"]
                     open_shelve['links'] = self.sdx_topology["links"]
                     # now, we simply close the shelf file.
-                    open_shelve.close()
+                    open_shelve.sync()
             return {"result": self.sdx_topology,
                     "status_code": post_topology.status_code}
         return {"result": post_topology.json(),
@@ -183,7 +183,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
                 shelve_events = log_events['events']
                 shelve_events.append(event.name)
                 log_events['events'] = shelve_events
-                log_events.close()
+                log_events.sync()
             return self.post_sdx_topology(event_type, event.timestamp)
         return {"event": event, "topology": self.get_kytos_topology()}
 
@@ -210,11 +210,11 @@ class Main(KytosNApp):  # pylint: disable=R0904
                 self.dict_shelve = dict(open_shelve)  # pylint: disable=W0201
                 self.shelve_loaded = True  # pylint: disable=W0201
                 # now, we simply close the shelf file.
-                open_shelve.close()
+                open_shelve.sync()
             # open the events shelve file
             with shelve.open("events_shelve") as events_shelve:
                 events_shelve['events'] = []
-                events_shelve.close()
+                events_shelve.sync()
 
     # rest api tests
 
