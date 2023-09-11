@@ -83,7 +83,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
                 ) from exception
         return {"result": response.json(), "status_code": response.status_code}
 
-    def convert_topology(self, event_type=0, event_timestamp=None):
+    def convert_topology(self, event_type=None, event_timestamp=None):
         """Function that will take care of update the shelve containing
         the version control that will be updated every time a change is
         detected in kytos topology, and return a new sdx topology"""
@@ -93,13 +93,16 @@ class Main(KytosNApp):  # pylint: disable=R0904
                 version = open_shelve['version']
                 self.dict_shelve = dict(open_shelve)  # pylint: disable=W0201
                 open_shelve.close()
-            if version >= 1 and event_type != 0:
+            if version >= 1 and event_type is not None:
                 timestamp = utils.get_timestamp()
-                if event_type == 1:
+                if event_type == "administrative":
                     version += 1
-                elif event_type == 2:
+                elif event_type == "operational":
                     timestamp = event_timestamp
-                return ParseConvertTopology(
+                else:
+                    return {"result": topology_mock.topology_mock(),
+                            "status_code": 401}
+                topology_converted = ParseConvertTopology(
                     topology=self.get_kytos_topology(),
                     version=version,
                     timestamp=timestamp,
@@ -107,20 +110,21 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     oxp_name=self.dict_shelve['oxp_name'],
                     oxp_url=self.dict_shelve['oxp_url'],
                 ).parse_convert_topology()
+                return {"result": topology_converted, "status_code": 200}
             return {"result": topology_mock.topology_mock(),
-                    "status_code": 200}
+                    "status_code": 401}
         except Exception as err:  # pylint: disable=W0703
-            log.info("validation Error, status code 400:", err)
-            return {"result": "Validation Error", "status_code": 400}
+            log.info("validation Error, status code 401:", err)
+            return {"result": "Validation Error", "status_code": 401}
 
-    def post_sdx_lc(self, event_type):
+    def post_sdx_lc(self, event_type=None):
         """ return the status from post sdx topology to sdx lc"""
         post_topology = requests.post(
                 settings.SDX_LC_TOPOLOGY,
                 timeout=10,
                 json=self.sdx_topology)
         if post_topology.status_code == 200:
-            if event_type != 0:
+            if event_type is not None:
                 # open the topology shelve
                 with shelve.open("topology_shelve") as open_shelve:
                     open_shelve['version'] = self.sdx_topology["version"]
@@ -134,28 +138,29 @@ class Main(KytosNApp):  # pylint: disable=R0904
         return {"result": post_topology.json(),
                 "status_code": post_topology.status_code}
 
-    def post_sdx_topology(self, event_type=0, event_timestamp=None):
+    def post_sdx_topology(self, event_type=None, event_timestamp=None):
         """ return the topology following the SDX data model"""
         # pylint: disable=W0201
         try:
-            if event_type != 0:
-                topology_update = self.convert_topology(
+            if event_type is not None:
+                converted_topology = self.convert_topology(
                         event_type, event_timestamp)
-                self.sdx_topology = {
-                        "id": topology_update["id"],
-                        "name": topology_update["name"],
-                        "version": topology_update["version"],
-                        "model_version": topology_update["model_version"],
-                        "timestamp": topology_update["timestamp"],
-                        "nodes": topology_update["nodes"],
-                        "links": topology_update["links"],
+                if converted_topology["status_code"] == 200:
+                    topology_updated = converted_topology["result"]
+                    self.sdx_topology = {
+                        "id": topology_updated["id"],
+                        "name": topology_updated["name"],
+                        "version": topology_updated["version"],
+                        "model_version": topology_updated["model_version"],
+                        "timestamp": topology_updated["timestamp"],
+                        "nodes": topology_updated["nodes"],
+                        "links": topology_updated["links"],
                         }
             else:
                 self.sdx_topology = topology_mock.topology_mock()
             evaluate_topology = self.validate_sdx_topology()
             if evaluate_topology["status_code"] == 200:
-                result = self.post_sdx_lc(event_type)
-                return result
+                return self.post_sdx_lc(event_type)
             return {"result": evaluate_topology['result'],
                     "status_code": evaluate_topology['status_code']}
         except Exception as err:  # pylint: disable=W0703
@@ -164,21 +169,34 @@ class Main(KytosNApp):  # pylint: disable=R0904
 
     @listen_to(
             "kytos/topology.link_*",
+            "kytos/topology.switch.*",
             pool="dynamic_single")
     def listen_event(self, event=None):
         """Function meant for listen topology"""
         if event is not None and self.version_control:
+            dpid = ""
             if event.name in settings.ADMIN_EVENTS:
-                event_type = 1
+                switch_event = {
+                        "kytos/topology.switch.enabled": True,
+                        "kytos/topology.switch.disabled": True
+                        }
+                if switch_event.get(event.name, False):
+                    event_type = "administrative"
+                    dpid = event.content["dpid"]
+                else:
+                    event_type = None
             elif event.name in settings.OPERATIONAL_EVENTS and \
                     event.timestamp is not None:
-                event_type = 2
+                event_type = "operational"
             else:
+                event_type = None
+            if event_type is None:
                 return {"event": "not action event"}
             # open the event shelve
             with shelve.open("events_shelve") as log_events:
                 shelve_events = log_events['events']
                 shelve_events.append(event.name)
+                shelve_events.append(dpid)
                 log_events['events'] = shelve_events
                 log_events.close()
             return self.post_sdx_topology(event_type, event.timestamp)
