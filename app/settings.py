@@ -5,6 +5,8 @@ KYTOS_SDX_TOPOLOGY_API = \
         "http://0.0.0.0:8181/api/kytos/sdx_topology/v1"
 KYTOS_SDX_TOPOLOGY = \
         "http://0.0.0.0:8181/api/kytos/sdx_topology/v1/topology"
+KYTOS_SDX_TOPOLOGY_VERSION_CONTROL = \
+        "http://0.0.0.0:8181/api/kytos/sdx_topology/v1/version/control"
 SDX_TOPOLOGY_VALIDATE = \
         "http://0.0.0.0:8000/validator/v1/validate"
 SDX_LC_TOPOLOGY = "http://0.0.0.0:8080/sdx-lc/v2/topology"

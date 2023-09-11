@@ -36,6 +36,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
         self.event_info = {}  # pylint: disable=W0201
         self.sdx_topology = {}  # pylint: disable=W0201
         self.shelve_loaded = False  # pylint: disable=W0201
+        self.version_control = False  # pylint: disable=W0201
 
     def execute(self):
         """Run after the setup method execution.
@@ -91,7 +92,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
             with shelve.open("topology_shelve") as open_shelve:
                 version = open_shelve['version']
                 self.dict_shelve = dict(open_shelve)  # pylint: disable=W0201
-                open_shelve.sync()
+                open_shelve.close()
             if version >= 1 and event_type != 0:
                 timestamp = utils.get_timestamp()
                 if event_type == 1:
@@ -127,7 +128,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     open_shelve['nodes'] = self.sdx_topology["nodes"]
                     open_shelve['links'] = self.sdx_topology["links"]
                     # now, we simply close the shelf file.
-                    open_shelve.sync()
+                    open_shelve.close()
             return {"result": self.sdx_topology,
                     "status_code": post_topology.status_code}
         return {"result": post_topology.json(),
@@ -166,7 +167,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
             pool="dynamic_single")
     def listen_event(self, event=None):
         """Function meant for listen topology"""
-        if event is not None and self.get_kytos_topology():
+        if event is not None and self.version_control:
             if event.name in settings.ADMIN_EVENTS:
                 event_type = 1
             elif event.name in settings.OPERATIONAL_EVENTS and \
@@ -179,9 +180,9 @@ class Main(KytosNApp):  # pylint: disable=R0904
                 shelve_events = log_events['events']
                 shelve_events.append(event.name)
                 log_events['events'] = shelve_events
-                log_events.sync()
+                log_events.close()
             return self.post_sdx_topology(event_type, event.timestamp)
-        return {"event": event, "topology": self.get_kytos_topology()}
+        return {"event": "not action event"}
 
     def load_shelve(self):  # pylint: disable=W0613
         """Function meant for validation, to make sure that the store_shelve
@@ -191,7 +192,8 @@ class Main(KytosNApp):  # pylint: disable=R0904
             # open the sdx topology shelve file
             with shelve.open("topology_shelve") as open_shelve:
                 if 'id' not in open_shelve.keys() or \
-                        'name' not in open_shelve.keys():
+                        'name' not in open_shelve.keys() or \
+                        'version' not in open_shelve.keys():
                     # initialize sdx topology
                     open_shelve['id'] = URN+"topology:"+os.environ.get(
                             "OXPO_URL")
@@ -206,14 +208,32 @@ class Main(KytosNApp):  # pylint: disable=R0904
                 self.dict_shelve = dict(open_shelve)  # pylint: disable=W0201
                 self.shelve_loaded = True  # pylint: disable=W0201
                 # now, we simply close the shelf file.
-                open_shelve.sync()
+                open_shelve.close()
             # open the events shelve file
             with shelve.open("events_shelve") as events_shelve:
                 events_shelve['events'] = []
-                events_shelve.sync()
+                events_shelve.close()
+
+    @rest("v1/version/control", methods=["GET"])
+    def get_version_control(self, _request: Request) -> JSONResponse:
+        """return true if kytos topology is ready"""
+        dict_shelve = {}
+        if self.get_kytos_topology():
+            self.load_shelve()
+            # open the sdx topology shelve file
+            with shelve.open("topology_shelve") as open_shelve:
+                if 'id' in open_shelve.keys() and \
+                        'name' in open_shelve.keys() and \
+                        'version' in open_shelve.keys():
+                    # initialize version control
+                    if open_shelve['version'] == 0:
+                        open_shelve['version'] = 1
+                        self.version_control = True  # pylint: disable=W0201
+                    dict_shelve = dict(open_shelve)
+                    open_shelve.close()
+        return JSONResponse(dict_shelve)
 
     # rest api tests
-
     @rest("v1/validate_sdx_topology", methods=["POST"])
     def get_validate_sdx_topology(self, request: Request) -> JSONResponse:
         """ REST to return the validated sdx topology status"""
@@ -250,7 +270,6 @@ class Main(KytosNApp):  # pylint: disable=R0904
     @rest("v1/listen_event", methods=["POST"])
     def get_listen_event(self, request: Request) -> JSONResponse:
         """consume call listen Event"""
-        f_name = " get_listen_event "
         try:
             result = get_json_or_400(request, self.controller.loop)
             name = result.get("name")
@@ -258,8 +277,8 @@ class Main(KytosNApp):  # pylint: disable=R0904
             event = KytosEvent(
                     name=name, content=content)
             # self.controller.buffers.app.put(event)
-            sdx_topology = self.listen_event(event)
-            return JSONResponse({"sdx_topology": sdx_topology})
+            event_result = self.listen_event(event)
+            return JSONResponse(event_result)
         except requests.exceptions.HTTPError as http_error:
             raise SystemExit(
                     http_error, detail="listen topology fails") from http_error
@@ -269,13 +288,13 @@ class Main(KytosNApp):  # pylint: disable=R0904
         """return sdx topology shelve"""
         open_shelve = shelve.open("topology_shelve")
         dict_shelve = dict(open_shelve)
+        dict_shelve["version_control"] = self.version_control
         open_shelve.close()
         return JSONResponse(dict_shelve)
 
     @rest("v1/shelve/events", methods=["GET"])
     def get_shelve_events(self, _request: Request) -> JSONResponse:
         """return events shelve"""
-        f_name = " get_shelve_events "
         with shelve.open("events_shelve") as open_shelve:
             events = open_shelve['events']
         open_shelve.close()
