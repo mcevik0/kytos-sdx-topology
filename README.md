@@ -7,145 +7,33 @@ Kytos Napp to handle the requirements of the AtlanticWave-SDX project.
 Requirements
 ============
 
-* Debian 10
-* mongodb
-* docker
-* openAPI Specification
-* swagger client
-* flask
-* python 3.9
-* python3-pip
-* python3-ven
 * kytos/core
 * kytos/topology
-* curl
-* mininet
+* openAPI Specification
+* flask
+* python 3.9
 
 Preparing the environment:
 ==========================
 
-``Installing Python, Docker and Mongodb``
+``Installing Python``
 
-* If you don't have Python 3 installed, please install it. Please make sure that you're using python3.9
+Please make sure that you're using python3.9
 
-* 1.- Python, Pip, Virtual Env, Mongodb, Docker and dependencies for Debian 10 
 
-* Download and Run:
-
-https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/0_envsetup.sh
-
-$ ./0_envsetup.sh
-
-``Installing Kytos Virtual env``
-
-* 2.- Virtual environment and Kytos
-
-* Download and Run:
-
-https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/1_kytosdir.sh
-
-$ ./1_kytosdir.sh
-
-* Download and run inside /kytos directory:
-
-https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/2_venvinstall.sh
-
-$ cd /kytos
-
-$ ./2_venvinstall.sh
-
-``Activate environment and install python dependencies``
-
-* 3.- Python dependencies
-
-$ cd /kytos
-
-$ source python-kytos/bin/activate
-
-* Download and run after the environment is activated
-
-https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/3_pipinstall.sh
-
-(venv-python3.9) ./3_pipinstall.sh
-
-``Clone Kytos``
-
-* 4.- kytos python-openflow kytos-utils flow_manager mef_eline of_core of_lldp pathfinder storehouse topology and sdx_topology
-
-* Download and run inside /kytos directory:
-
-https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/4_clone_kytos.sh
-
-(venv-python3.9) cd /kytos
-
-(venv-python3.9) ./4_clone_kytos.sh
-
-``Installing Kytos``
-
-5.- kytos and napps setup
-
-* Download and run inside /kytos directory:
-
-https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/5_install_kytos.sh 
-
-(venv-python3.9) ./5_install_kytos.sh
-
-``Install Docker mongodb container``
-
-* Download and Run:
-
-https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/6_add-etc-hosts.sh
-
-(venv-python3.9) cd /kytos/sdx_topology/install
-
-(venv-python3.9) ./6_add-etc-hosts.sh
-
-* After add hosts, restart the network interface or the host
-
-* Inside /kytos/kytos run docker-compose
-
-(venv-python3.9) cd /kytos/kytos
-
-(venv-python3.9) docker-compose up -d
-
-* Download and Run:
-
-https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/install/7_rs-init.sh
-
-(venv-python3.9) cd /kytos/sdx_topology/install
-
-(venv-python3.9) ./7_rs-init.sh
-
-``run Kytos``
-
-(venv-python3.9) kytosd -f --database mongodb
-
-``run Mock provisioning``
-
-* In another terminal start the flask app to Mock Provisioning listening
-
-https://github.com/atlanticwave-sdx/kytos-sdx-topology/blob/main/envsetup/sdx_lc_mock/flaskrun.sh
-
-* This will be listening on the endpoint: 
-
-* http://0.0.0.0:8088/SDX-LC/1.0.0/provision
-
-Installing swagger_client
+Installation 
 ==========================
 
-For the whole installation process and requirements, please access
-the AtlanticWave SDX repo in Github: https://github.com/atlanticwave-sdx
+* For the whole installation process and requirements, please access the AtlanticWave SDX repo in Github: https://github.com/atlanticwave-sdx
 
-How to Use
-==========
+* The KytoS SDX Topology Napp is pivotal in the Atlantic Wave SDX system, serving as a cornerstone of the system's architecture. Its functionality and contributions are integral to the system's successful operation. 
 
-TBD
+* It's important to note that this repository functions as a submodule of the principal repository located at https://github.com/atlanticwave-sdx/sdx-continuous-development. 
 
+* The KytoS SDX Topology Napp is installed within the principal repository as part of the seamless integration process. This interconnected setup allows for a cohesive deployment of the entire system, ensuring that the features and capabilities of the Napp are harnessed effectively within the broader context of the Atlantic Wave SDX system. 
 
-Version
-=======
+* By maintaining this modular structure and close integration, we can harness the full potential of the KytoS SDX Topology Napp while contributing to the overall robustness and functionality of the Atlantic Wave SDX system. 
 
-1.0.0
 
 # Test
 
