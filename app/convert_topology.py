@@ -4,6 +4,8 @@ Main class of kytos/sdx_topology Kytos Network Application.
 SDX API
 """
 import secrets
+from kytos.core import log
+HSH = "##########"
 
 
 class ParseConvertTopology:
@@ -324,6 +326,15 @@ class ParseConvertTopology:
 
     def parse_convert_topology(self):
         """ function get_sdx_topology """
+        log.info(f"{HSH}{HSH}{HSH}")
+        log.info(f"{HSH} parse convert topology{HSH}")
+        # log.info(f"{HSH} self.kytos_topology {self.kytos_topology} {HSH}")
+        log.info(f"{HSH} self.version {self.version} {HSH}")
+        log.info(f"{HSH} self.timestamp {self.timestamp} {HSH}")
+        log.info(f"{HSH}self.model_version {self.model_version} {HSH}")
+        log.info(f"{HSH} self.oxp_name {self.oxp_name} {HSH}")
+        log.info(f"{HSH} self.oxp_url {self.oxp_url} {HSH}")
+        log.info(f"{HSH}{HSH}{HSH}")
         topology = {}
         topology["name"] = self.oxp_name
         topology["id"] = f"urn:sdx:topology:{self.oxp_url}"
@@ -333,4 +344,7 @@ class ParseConvertTopology:
         topology["nodes"] = self.get_sdx_nodes()
         topology["links"] = self.get_sdx_links()
         topology["links"] += self.create_inter_oxp_link_entries()
+        log.info(f"{HSH}{HSH}{HSH}")
+        log.info(f"{HSH} return parse convert topology{HSH}")
+        log.info(f"{HSH}{HSH}{HSH}")
         return topology

@@ -4,8 +4,8 @@ Main module of amlight/sdx Kytos Network Application.
 import os
 import shelve
 import requests
-from napps.kytos.sdx_topology.convert_topology import (
-        ParseConvertTopology)  # pylint: disable=E0401
+from napps.kytos.sdx_topology.convert_topology import ParseConvertTopology \
+          # pylint: disable=E0401
 from napps.kytos.sdx_topology import settings, utils, topology_mock \
         # pylint: disable=E0401
 
@@ -68,6 +68,29 @@ class Main(KytosNApp):  # pylint: disable=R0904
                 settings.KYTOS_TOPOLOGY, timeout=10).json()
         return kytos_topology["topology"]
 
+    def post_sdx_lc(self, event_type=None):
+        """ return the status from post sdx topology to sdx lc"""
+        post_topology = requests.post(
+                settings.SDX_LC_TOPOLOGY,
+                timeout=10,
+                json=self.sdx_topology)
+        status_code = post_topology.status_code
+        status_code = 200
+        if status_code == 200:
+            if event_type is not None:
+                # open the topology shelve
+                with shelve.open("topology_shelve") as open_shelve:
+                    open_shelve['version'] = self.sdx_topology["version"]
+                    open_shelve['timestamp'] = self.sdx_topology["timestamp"]
+                    open_shelve['nodes'] = self.sdx_topology["nodes"]
+                    open_shelve['links'] = self.sdx_topology["links"]
+                    # now, we simply close the shelf file.
+                    open_shelve.close()
+            return {"result": self.sdx_topology,
+                    "status_code": post_topology.status_code}
+        return {"result": post_topology.json(),
+                "status_code": post_topology.status_code}
+
     def validate_sdx_topology(self):
         """ return 200 if validated topology following the SDX data model"""
         try:
@@ -94,8 +117,8 @@ class Main(KytosNApp):  # pylint: disable=R0904
                 self.dict_shelve = dict(open_shelve)  # pylint: disable=W0201
                 open_shelve.close()
             if version >= 1 and event_type is not None:
-                timestamp = utils.get_timestamp()
                 if event_type == "administrative":
+                    timestamp = utils.get_timestamp()
                     version += 1
                 elif event_type == "operational":
                     timestamp = event_timestamp
@@ -107,8 +130,8 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     version=version,
                     timestamp=timestamp,
                     model_version=self.dict_shelve['model_version'],
-                    oxp_name=self.dict_shelve['oxp_name'],
-                    oxp_url=self.dict_shelve['oxp_url'],
+                    oxp_name=self.dict_shelve['name'],
+                    oxp_url=self.dict_shelve['url'],
                 ).parse_convert_topology()
                 return {"result": topology_converted, "status_code": 200}
             return {"result": topology_mock.topology_mock(),
@@ -116,27 +139,6 @@ class Main(KytosNApp):  # pylint: disable=R0904
         except Exception as err:  # pylint: disable=W0703
             log.info("validation Error, status code 401:", err)
             return {"result": "Validation Error", "status_code": 401}
-
-    def post_sdx_lc(self, event_type=None):
-        """ return the status from post sdx topology to sdx lc"""
-        post_topology = requests.post(
-                settings.SDX_LC_TOPOLOGY,
-                timeout=10,
-                json=self.sdx_topology)
-        if post_topology.status_code == 200:
-            if event_type is not None:
-                # open the topology shelve
-                with shelve.open("topology_shelve") as open_shelve:
-                    open_shelve['version'] = self.sdx_topology["version"]
-                    open_shelve['timestamp'] = self.sdx_topology["timestamp"]
-                    open_shelve['nodes'] = self.sdx_topology["nodes"]
-                    open_shelve['links'] = self.sdx_topology["links"]
-                    # now, we simply close the shelf file.
-                    open_shelve.close()
-            return {"result": self.sdx_topology,
-                    "status_code": post_topology.status_code}
-        return {"result": post_topology.json(),
-                "status_code": post_topology.status_code}
 
     def post_sdx_topology(self, event_type=None, event_timestamp=None):
         """ return the topology following the SDX data model"""
@@ -195,8 +197,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
             # open the event shelve
             with shelve.open("events_shelve") as log_events:
                 shelve_events = log_events['events']
-                shelve_events.append(event.name)
-                shelve_events.append(dpid)
+                shelve_events.append({"name": event.name, "dpid": dpid})
                 log_events['events'] = shelve_events
                 log_events.close()
             return self.post_sdx_topology(event_type, event.timestamp)
@@ -249,6 +250,9 @@ class Main(KytosNApp):  # pylint: disable=R0904
                         self.version_control = True  # pylint: disable=W0201
                     dict_shelve = dict(open_shelve)
                     open_shelve.close()
+                    event_timestamp = utils.get_timestamp()
+                    event_type = "administrative"
+                    self.post_sdx_topology(event_type, event_timestamp)
         return JSONResponse(dict_shelve)
 
     # rest api tests
