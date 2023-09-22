@@ -4,8 +4,8 @@ Main module of amlight/sdx Kytos Network Application.
 import os
 import shelve
 import requests
-from napps.kytos.sdx_topology.convert_topology import (
-        ParseConvertTopology)  # pylint: disable=E0401
+from napps.kytos.sdx_topology.convert_topology import ParseConvertTopology \
+          # pylint: disable=E0401
 from napps.kytos.sdx_topology import settings, utils, topology_mock \
         # pylint: disable=E0401
 
@@ -68,62 +68,23 @@ class Main(KytosNApp):  # pylint: disable=R0904
                 settings.KYTOS_TOPOLOGY, timeout=10).json()
         return kytos_topology["topology"]
 
-    def validate_sdx_topology(self):
-        """ return 200 if validated topology following the SDX data model"""
-        try:
-            response = requests.post(
-                    settings.SDX_TOPOLOGY_VALIDATE,
-                    json=self.sdx_topology,
-                    timeout=10)
-        except ValueError as exception:
-            log.info("validate topology result %s %s", exception, 401)
-            raise HTTPException(
-                    401,
-                    detail=f"Path is not valid: {exception}"
-                ) from exception
-        return {"result": response.json(), "status_code": response.status_code}
-
-    def convert_topology(self, event_type=None, event_timestamp=None):
-        """Function that will take care of update the shelve containing
-        the version control that will be updated every time a change is
-        detected in kytos topology, and return a new sdx topology"""
-        try:
-            # open the topology shelve
-            with shelve.open("topology_shelve") as open_shelve:
-                version = open_shelve['version']
-                self.dict_shelve = dict(open_shelve)  # pylint: disable=W0201
-                open_shelve.close()
-            if version >= 1 and event_type is not None:
-                timestamp = utils.get_timestamp()
-                if event_type == "administrative":
-                    version += 1
-                elif event_type == "operational":
-                    timestamp = event_timestamp
-                else:
-                    return {"result": topology_mock.topology_mock(),
-                            "status_code": 401}
-                topology_converted = ParseConvertTopology(
-                    topology=self.get_kytos_topology(),
-                    version=version,
-                    timestamp=timestamp,
-                    model_version=self.dict_shelve['model_version'],
-                    oxp_name=self.dict_shelve['oxp_name'],
-                    oxp_url=self.dict_shelve['oxp_url'],
-                ).parse_convert_topology()
-                return {"result": topology_converted, "status_code": 200}
-            return {"result": topology_mock.topology_mock(),
-                    "status_code": 401}
-        except Exception as err:  # pylint: disable=W0703
-            log.info("validation Error, status code 401:", err)
-            return {"result": "Validation Error", "status_code": 401}
-
     def post_sdx_lc(self, event_type=None):
         """ return the status from post sdx topology to sdx lc"""
         post_topology = requests.post(
                 settings.SDX_LC_TOPOLOGY,
                 timeout=10,
                 json=self.sdx_topology)
-        if post_topology.status_code == 200:
+        status_code = post_topology.status_code
+        log.info(f"{HSH}{HSH}{HSH}")
+        log.info(f"{HSH} post topology code: {status_code}{HSH}")
+        log.info(f"{HSH}{HSH}{HSH}")
+        status_code = 200
+        log.info(f"{HSH} post topology code: {status_code}{HSH}")
+        log.info(f"{HSH}{HSH}{HSH}")
+        log.info(f"{HSH}{self.sdx_toology}{HSH}")
+        log.info(f"{HSH}{HSH}{HSH}")
+        status_code = 200
+        if status_code == 200:
             if event_type is not None:
                 # open the topology shelve
                 with shelve.open("topology_shelve") as open_shelve:
@@ -138,14 +99,75 @@ class Main(KytosNApp):  # pylint: disable=R0904
         return {"result": post_topology.json(),
                 "status_code": post_topology.status_code}
 
+    def validate_sdx_topology(self):
+        """ return 200 if validated topology following the SDX data model"""
+        log.info(f"{HSH}{HSH}{HSH}")
+        log.info(f"{HSH} validate sdx topology: {HSH}")
+        log.info(f"{HSH}{HSH}{HSH}")
+        try:
+            response = requests.post(
+                    settings.SDX_TOPOLOGY_VALIDATE,
+                    json=self.sdx_topology,
+                    timeout=10)
+        except ValueError as exception:
+            log.info("validate topology result %s %s", exception, 401)
+            raise HTTPException(
+                    401,
+                    detail=f"Path is not valid: {exception}"
+                ) from exception
+        log.info(f"{HSH}{HSH}{HSH}")
+        log.info(f"{HSH} response:{response.status_code} {HSH}")
+        log.info(f"{HSH}{HSH}{HSH}")
+        return {"result": response.json(), "status_code": response.status_code}
+
+    def convert_topology(self, event_type=None, event_timestamp=None):
+        """Function that will take care of update the shelve containing
+        the version control that will be updated every time a change is
+        detected in kytos topology, and return a new sdx topology"""
+        try:
+            # open the topology shelve
+            with shelve.open("topology_shelve") as open_shelve:
+                version = open_shelve['version']
+                self.dict_shelve = dict(open_shelve)  # pylint: disable=W0201
+                open_shelve.close()
+            if version >= 1 and event_type is not None:
+                if event_type == "administrative":
+                    timestamp = utils.get_timestamp()
+                    version += 1
+                elif event_type == "operational":
+                    timestamp = event_timestamp
+                else:
+                    return {"result": topology_mock.topology_mock(),
+                            "status_code": 401}
+                topology_converted = ParseConvertTopology(
+                    topology=self.get_kytos_topology(),
+                    version=version,
+                    timestamp=timestamp,
+                    model_version=self.dict_shelve['model_version'],
+                    oxp_name=self.dict_shelve['name'],
+                    oxp_url=self.dict_shelve['url'],
+                ).parse_convert_topology()
+                return {"result": topology_converted, "status_code": 200}
+            return {"result": topology_mock.topology_mock(),
+                    "status_code": 401}
+        except Exception as err:  # pylint: disable=W0703
+            log.info("validation Error, status code 401:", err)
+            return {"result": "Validation Error", "status_code": 401}
+
     def post_sdx_topology(self, event_type=None, event_timestamp=None):
         """ return the topology following the SDX data model"""
         # pylint: disable=W0201
+        log.info(f"{HSH}{HSH}{HSH}")
+        log.info(f"{HSH} post sdx topology: {event_type}{HSH}")
+        log.info(f"{HSH}{HSH}{HSH}")
         try:
             if event_type is not None:
                 converted_topology = self.convert_topology(
                         event_type, event_timestamp)
                 if converted_topology["status_code"] == 200:
+                    log.info(f"{HSH}{HSH}{HSH}")
+                    log.info(f"{HSH} convertedtopology {HSH}")
+                    log.info(f"{HSH}{HSH}{HSH}")
                     topology_updated = converted_topology["result"]
                     self.sdx_topology = {
                         "id": topology_updated["id"],
@@ -159,6 +181,13 @@ class Main(KytosNApp):  # pylint: disable=R0904
             else:
                 self.sdx_topology = topology_mock.topology_mock()
             evaluate_topology = self.validate_sdx_topology()
+            log.info(f"{HSH}{HSH}{HSH}")
+            log.info(f"{HSH} validated topology {HSH}")
+            log.info(f"{HSH}{HSH}{HSH}")
+            status_code = evaluate_topology["status_code"]
+            log.info(f"{HSH}{HSH}{HSH}")
+            log.info(f"{HSH} evaluate topology code: {status_code}{HSH}")
+            log.info(f"{HSH}{HSH}{HSH}")
             if evaluate_topology["status_code"] == 200:
                 return self.post_sdx_lc(event_type)
             return {"result": evaluate_topology['result'],
@@ -173,10 +202,14 @@ class Main(KytosNApp):  # pylint: disable=R0904
             pool="dynamic_single")
     def listen_event(self, event=None):
         """Function meant for listen topology"""
+        log.info(f"{HSH}{HSH}{HSH}")
+        log.info(f"{HSH} listen_event: {event}{HSH}")
+        log.info(f"{HSH}{HSH}{HSH}")
         if event is not None and self.version_control:
             dpid = ""
             if event.name in settings.ADMIN_EVENTS:
                 switch_event = {
+                        "version/control.initialize": True,
                         "kytos/topology.switch.enabled": True,
                         "kytos/topology.switch.disabled": True
                         }
@@ -195,8 +228,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
             # open the event shelve
             with shelve.open("events_shelve") as log_events:
                 shelve_events = log_events['events']
-                shelve_events.append(event.name)
-                shelve_events.append(dpid)
+                shelve_events.append({"name": event.name, "dpid": dpid})
                 log_events['events'] = shelve_events
                 log_events.close()
             return self.post_sdx_topology(event_type, event.timestamp)
@@ -247,6 +279,11 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     if open_shelve['version'] == 0:
                         open_shelve['version'] = 1
                         self.version_control = True  # pylint: disable=W0201
+                        name = "version/control.initialize"
+                        content = {"dpid": ""}
+                        event = KytosEvent(name=name, content=content)
+                        # self.controller.buffers.app.put(event)
+                        self.listen_event(event)
                     dict_shelve = dict(open_shelve)
                     open_shelve.close()
         return JSONResponse(dict_shelve)
