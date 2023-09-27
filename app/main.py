@@ -75,14 +75,6 @@ class Main(KytosNApp):  # pylint: disable=R0904
                 timeout=10,
                 json=self.sdx_topology)
         status_code = post_topology.status_code
-        log.info(f"{HSH}{HSH}{HSH}")
-        log.info(f"{HSH} post topology code: {status_code}{HSH}")
-        log.info(f"{HSH}{HSH}{HSH}")
-        status_code = 200
-        log.info(f"{HSH} post topology code: {status_code}{HSH}")
-        log.info(f"{HSH}{HSH}{HSH}")
-        log.info(f"{HSH}{self.sdx_toology}{HSH}")
-        log.info(f"{HSH}{HSH}{HSH}")
         status_code = 200
         if status_code == 200:
             if event_type is not None:
@@ -101,9 +93,6 @@ class Main(KytosNApp):  # pylint: disable=R0904
 
     def validate_sdx_topology(self):
         """ return 200 if validated topology following the SDX data model"""
-        log.info(f"{HSH}{HSH}{HSH}")
-        log.info(f"{HSH} validate sdx topology: {HSH}")
-        log.info(f"{HSH}{HSH}{HSH}")
         try:
             response = requests.post(
                     settings.SDX_TOPOLOGY_VALIDATE,
@@ -115,9 +104,6 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     401,
                     detail=f"Path is not valid: {exception}"
                 ) from exception
-        log.info(f"{HSH}{HSH}{HSH}")
-        log.info(f"{HSH} response:{response.status_code} {HSH}")
-        log.info(f"{HSH}{HSH}{HSH}")
         return {"result": response.json(), "status_code": response.status_code}
 
     def convert_topology(self, event_type=None, event_timestamp=None):
@@ -157,17 +143,11 @@ class Main(KytosNApp):  # pylint: disable=R0904
     def post_sdx_topology(self, event_type=None, event_timestamp=None):
         """ return the topology following the SDX data model"""
         # pylint: disable=W0201
-        log.info(f"{HSH}{HSH}{HSH}")
-        log.info(f"{HSH} post sdx topology: {event_type}{HSH}")
-        log.info(f"{HSH}{HSH}{HSH}")
         try:
             if event_type is not None:
                 converted_topology = self.convert_topology(
                         event_type, event_timestamp)
                 if converted_topology["status_code"] == 200:
-                    log.info(f"{HSH}{HSH}{HSH}")
-                    log.info(f"{HSH} convertedtopology {HSH}")
-                    log.info(f"{HSH}{HSH}{HSH}")
                     topology_updated = converted_topology["result"]
                     self.sdx_topology = {
                         "id": topology_updated["id"],
@@ -180,15 +160,11 @@ class Main(KytosNApp):  # pylint: disable=R0904
                         }
             else:
                 self.sdx_topology = topology_mock.topology_mock()
+            # main.py:105 - 121:validate_sdx_topology 
             evaluate_topology = self.validate_sdx_topology()
-            log.info(f"{HSH}{HSH}{HSH}")
-            log.info(f"{HSH} validated topology {HSH}")
-            log.info(f"{HSH}{HSH}{HSH}")
             status_code = evaluate_topology["status_code"]
-            log.info(f"{HSH}{HSH}{HSH}")
-            log.info(f"{HSH} evaluate topology code: {status_code}{HSH}")
-            log.info(f"{HSH}{HSH}{HSH}")
             if evaluate_topology["status_code"] == 200:
+                # main.py:78 - 86:post_sdx_lc
                 return self.post_sdx_lc(event_type)
             return {"result": evaluate_topology['result'],
                     "status_code": evaluate_topology['status_code']}
@@ -202,9 +178,6 @@ class Main(KytosNApp):  # pylint: disable=R0904
             pool="dynamic_single")
     def listen_event(self, event=None):
         """Function meant for listen topology"""
-        log.info(f"{HSH}{HSH}{HSH}")
-        log.info(f"{HSH} listen_event: {event}{HSH}")
-        log.info(f"{HSH}{HSH}{HSH}")
         if event is not None and self.version_control:
             dpid = ""
             if event.name in settings.ADMIN_EVENTS:
@@ -231,6 +204,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
                 shelve_events.append({"name": event.name, "dpid": dpid})
                 log_events['events'] = shelve_events
                 log_events.close()
+            # main.py:161:post_sdx_topology
             return self.post_sdx_topology(event_type, event.timestamp)
         return {"event": "not action event"}
 
