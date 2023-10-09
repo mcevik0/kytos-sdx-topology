@@ -74,9 +74,13 @@ class Main(KytosNApp):  # pylint: disable=R0904
                 settings.SDX_LC_TOPOLOGY,
                 timeout=10,
                 json=self.sdx_topology)
-        status_code = post_topology.status_code
-        status_code = 200
-        if status_code == 200:
+        result = post_topology.json()
+        log.info(f"{HSH}{HSH}{HSH}")
+        log.info(f"{HSH} post topology.status_code: {post_topology.status_code}{HSH}")
+        log.info(f"{HSH}{HSH}{HSH}")
+        log.info(f"{HSH} post topology: {result}{HSH}")
+        log.info(f"{HSH}{HSH}{HSH}")
+        if post_topology.status_code == 200:
             if event_type is not None:
                 # open the topology shelve
                 with shelve.open("topology_shelve") as open_shelve:
@@ -104,6 +108,12 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     401,
                     detail=f"Path is not valid: {exception}"
                 ) from exception
+        result = response.json()
+        log.info(f"{HSH}{HSH}{HSH}")
+        log.info(f"{HSH} validate topology.status_code: {response.status_code}{HSH}")
+        log.info(f"{HSH}{HSH}{HSH}")
+        log.info(f"{HSH} valid topology: {result}{HSH}")
+        log.info(f"{HSH}{HSH}{HSH}")
         return {"result": response.json(), "status_code": response.status_code}
 
     def convert_topology(self, event_type=None, event_timestamp=None):

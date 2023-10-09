@@ -29,24 +29,24 @@ class ParseConvertTopology:
     def get_link_port_speed(speed: str) -> int:
         """Function to obtain the speed of a specific port in the link."""
         type_to_speed = {
-                "400GE": 50000000000,
-                "50000000000": 50000000000,
-                "50000000000.0": 50000000000,
-                "100GE": 12500000000,
-                "12500000000": 12500000000,
-                "12500000000.0": 12500000000,
-                "50GE": 6250000000,
-                "6250000000": 6250000000,
-                "6250000000.0": 6250000000,
-                "40GE": 5000000000,
-                "5000000000": 5000000000,
-                "5000000000.0": 5000000000,
+                "400GE": 500000,
+                "50000000000": 500000,
+                "50000000000.0": 500000,
+                "100GE": 125000,
+                "12500000000": 125000,
+                "12500000000.0": 125000,
+                "50GE": 62500,
+                "6250000000": 62500,
+                "6250000000.0": 62500,
+                "40GE": 50000,
+                "5000000000": 50000,
+                "5000000000.0": 50000,
                 "25GE": 3125000000,
-                "3125000000": 3125000000,
-                "3125000000.0": 3125000000,
-                "10GE": 1250000000,
-                "1250000000": 1250000000,
-                "1250000000.0": 1250000000,
+                "3125000000": 31250,
+                "3125000000.0": 31250,
+                "10GE": 12500,
+                "1250000000": 12500,
+                "1250000000.0": 12500,
         }
 
         return type_to_speed.get(speed, 0)
@@ -220,8 +220,28 @@ class ParseConvertTopology:
         sdx_link["name"] = f"{node_swa}/{interface_a}_{node_swb}/{interface_b}"
         sdx_link["id"] = f"urn:sdx:link:{self.oxp_url}:%s" % sdx_link["name"]
         sdx_link["ports"] = [
-            self.get_sdx_port_urn(switch_a, interface_a),
-            self.get_sdx_port_urn(switch_b, interface_b),
+                {
+                    "id": self.get_sdx_port_urn(switch_a, interface_a),
+                    "name": "aaa",
+                    "node": "urn:sdx:node:"+sdx_link["name"],
+                    "type": "Other",
+                    "status": "error",
+                    "state": "disabled",
+                    "services": "",
+                    "nni": "False",
+                    "mtu": 0
+                },
+                {
+                    "id": self.get_sdx_port_urn(switch_b, interface_b),
+                    "name": "bbb",
+                    "node": "urn:sdx:node:"+sdx_link["name"],
+                    "type": "Other",
+                    "status": "error",
+                    "state": "disabled",
+                    "services": "",
+                    "nni": "False",
+                    "mtu": 0
+                },
         ]
         sdx_link["type"] = "intra"
 
@@ -240,7 +260,7 @@ class ParseConvertTopology:
                 elif item in ["residual_bandwidth", "availability"]:
                     sdx_link[item] = 100
                 else:
-                    sdx_link[item] = 0
+                    sdx_link[item] = 2
 
         sdx_link["status"] = (
             "up" if kytos_link["endpoint_a"]["active"] else "down")
@@ -317,7 +337,7 @@ class ParseConvertTopology:
                         sdx_link["availability"] = 100
                         sdx_link["residual_bandwidth"] = 100
                         sdx_link["packet_loss"] = 0
-                        sdx_link["latency"] = 0
+                        sdx_link["latency"] = 2
                         sdx_links.append(sdx_link)
                         del sdx_link
         return sdx_links
