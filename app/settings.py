@@ -9,7 +9,17 @@ KYTOS_SDX_TOPOLOGY_VERSION_CONTROL = \
         "http://0.0.0.0:8181/api/kytos/sdx_topology/v1/version/control"
 SDX_TOPOLOGY_VALIDATE = \
         "http://192.168.0.14:8000/validator/v1/validate"
-SDX_LC_TOPOLOGY = "http://192.168.0.15:8080/sdx-lc/v2/topology"
+
+SDX_LC_TOPOLOGY = [
+        "http://192.168.0.15:8080/sdx-lc/v2/topology",
+        "http://192.168.0.16:8080/sdx-lc/v2/topology",
+        "http://192.168.0.17:8080/sdx-lc/v2/topology",
+        "http://0.0.0.0:8084/sdx-lc/v2/topology",
+        "http://0.0.0.0:8085/sdx-lc/v2/topology",
+        "http://0.0.0.0:8086/sdx-lc/v2/topology"
+        ]
+
+
 HEADERS = {"Content-type": "application/json"}
 ADMIN_EVENTS = [
         "version/control.initialize",

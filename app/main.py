@@ -70,8 +70,14 @@ class Main(KytosNApp):  # pylint: disable=R0904
 
     def post_sdx_lc(self, event_type=None):
         """ return the status from post sdx topology to sdx lc"""
+        OXPO_ID = int(os.environ.get("OXPO_ID"))
+        sdx_lc_url = settings.SDX_LC_TOPOLOGY[OXPO_ID]
+        log.info(f"{HSH}{HSH}{HSH}")
+        log.info(f"{HSH} post sdx lc OXPO_ID: {OXPO_ID}")
+        log.info(f"{HSH} post sdx lc sdx lc url: {sdx_lc_url}")
+        log.info(f"{HSH}{HSH}{HSH}")
         post_topology = requests.post(
-                settings.SDX_LC_TOPOLOGY,
+                sdx_lc_url,
                 timeout=10,
                 json=self.sdx_topology)
         result = post_topology.json()
