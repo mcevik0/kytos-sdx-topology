@@ -37,6 +37,9 @@ class Main(KytosNApp):  # pylint: disable=R0904
         self.sdx_topology = {}  # pylint: disable=W0201
         self.shelve_loaded = False  # pylint: disable=W0201
         self.version_control = False  # pylint: disable=W0201
+        OXPO_ID = int(os.environ.get("OXPO_ID"))
+        sdx_lc_urls_str = os.environ.get("SDXLC_URLS")
+        self.sdxlc_url = sdx_lc_urls_str.split(",")[OXPO_ID]
 
     def execute(self):
         """Run after the setup method execution.
@@ -64,28 +67,20 @@ class Main(KytosNApp):  # pylint: disable=R0904
     @staticmethod
     def get_kytos_topology():
         """retrieve topology from API"""
+        kytos_topology_url = os.environ.get("KYTOS_TOPOLOGY")
         kytos_topology = requests.get(
-                settings.KYTOS_TOPOLOGY, timeout=10).json()
-        return kytos_topology["topology"]
+                kytos_topology_url, timeout=10).json()
+        result = kytos_topology["topology"]
+        return result
 
     def post_sdx_lc(self, event_type=None):
         """ return the status from post sdx topology to sdx lc"""
-        OXPO_ID = int(os.environ.get("OXPO_ID"))
-        sdx_lc_url = settings.SDX_LC_TOPOLOGY[OXPO_ID]
-        log.info(f"{HSH}{HSH}{HSH}")
-        log.info(f"{HSH} post sdx lc OXPO_ID: {OXPO_ID}")
-        log.info(f"{HSH} post sdx lc sdx lc url: {sdx_lc_url}")
-        log.info(f"{HSH}{HSH}{HSH}")
+        sdxlc_url = self.sdxlc_url
         post_topology = requests.post(
-                sdx_lc_url,
+                sdxlc_url,
                 timeout=10,
                 json=self.sdx_topology)
         result = post_topology.json()
-        log.info(f"{HSH}{HSH}{HSH}")
-        log.info(f"{HSH} post topology.status_code: {post_topology.status_code}{HSH}")
-        log.info(f"{HSH}{HSH}{HSH}")
-        log.info(f"{HSH} post topology: {result}{HSH}")
-        log.info(f"{HSH}{HSH}{HSH}")
         if post_topology.status_code == 200:
             if event_type is not None:
                 # open the topology shelve
@@ -104,8 +99,9 @@ class Main(KytosNApp):  # pylint: disable=R0904
     def validate_sdx_topology(self):
         """ return 200 if validated topology following the SDX data model"""
         try:
+            sdx_topology_validator = os.environ.get("SDXTOPOLOGY_VALIDATOR")
             response = requests.post(
-                    settings.SDX_TOPOLOGY_VALIDATE,
+                    sdx_topology_validator,
                     json=self.sdx_topology,
                     timeout=10)
         except ValueError as exception:
@@ -115,11 +111,6 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     detail=f"Path is not valid: {exception}"
                 ) from exception
         result = response.json()
-        log.info(f"{HSH}{HSH}{HSH}")
-        log.info(f"{HSH} validate topology.status_code: {response.status_code}{HSH}")
-        log.info(f"{HSH}{HSH}{HSH}")
-        log.info(f"{HSH} valid topology: {result}{HSH}")
-        log.info(f"{HSH}{HSH}{HSH}")
         return {"result": response.json(), "status_code": response.status_code}
 
     def convert_topology(self, event_type=None, event_timestamp=None):
@@ -182,6 +173,16 @@ class Main(KytosNApp):  # pylint: disable=R0904
             if evaluate_topology["status_code"] == 200:
                 # main.py:78 - 86:post_sdx_lc
                 return self.post_sdx_lc(event_type)
+            # open the event shelve
+            with shelve.open("events_shelve") as log_events:
+                shelve_events = log_events['events']
+                shelve_events.append(
+                        {
+                            "name": "Validation error",
+                            "Error": evaluate_topology["error_message"]
+                        })
+                log_events['events'] = shelve_events
+                log_events.close()
             return {"result": evaluate_topology['result'],
                     "status_code": evaluate_topology['status_code']}
         except Exception as err:  # pylint: disable=W0703
