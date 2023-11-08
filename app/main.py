@@ -40,6 +40,10 @@ class Main(KytosNApp):  # pylint: disable=R0904
         OXPO_ID = int(os.environ.get("OXPO_ID"))
         sdx_lc_urls_str = os.environ.get("SDXLC_URLS")
         self.sdxlc_url = sdx_lc_urls_str.split(",")[OXPO_ID]
+        oxpo_names_str = os.environ.get("OXPO_NAMES")
+        self.oxpo_name = oxpo_names_str.split(",")[OXPO_ID]
+        oxpo_urls_str = os.environ.get("OXPO_URLS")
+        self.oxpo_url = oxpo_urls_str.split(",")[OXPO_ID]
 
     def execute(self):
         """Run after the setup method execution.
