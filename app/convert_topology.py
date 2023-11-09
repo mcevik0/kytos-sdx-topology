@@ -26,6 +26,18 @@ class ParseConvertTopology:
         return self.kytos_topology["links"].values()
 
     @staticmethod
+    def get_port_status(port_status: str) -> str:
+        """Function to obtain the speed of a specific port in the link."""
+        lower_case = {
+                "UP": "up",
+                "up": "up",
+                "DOWN": "down",
+                "down": "down",
+        }
+
+        return lower_case.get(port_status, "error")
+
+    @staticmethod
     def get_link_port_speed(speed: str) -> int:
         """Function to obtain the speed of a specific port in the link."""
         type_to_speed = {
@@ -222,10 +234,10 @@ class ParseConvertTopology:
         sdx_link["ports"] = [
                 {
                     "id": self.get_sdx_port_urn(switch_a, interface_a),
-                    "name": "aaa",
+                    "name": kytos_link["endpoint_a"]["name"],
                     "node": "urn:sdx:node:"+sdx_link["name"],
                     "type": "Other",
-                    "status": "error",
+                    "status": "up",
                     "state": "disabled",
                     "services": "",
                     "nni": "False",
@@ -233,10 +245,10 @@ class ParseConvertTopology:
                 },
                 {
                     "id": self.get_sdx_port_urn(switch_b, interface_b),
-                    "name": "bbb",
+                    "name": kytos_link["endpoint_b"]["name"],
                     "node": "urn:sdx:node:"+sdx_link["name"],
                     "type": "Other",
-                    "status": "error",
+                    "status": "up",
                     "state": "disabled",
                     "services": "",
                     "nni": "False",

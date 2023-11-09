@@ -240,10 +240,9 @@ class Main(KytosNApp):  # pylint: disable=R0904
                         'name' not in open_shelve.keys() or \
                         'version' not in open_shelve.keys():
                     # initialize sdx topology
-                    open_shelve['id'] = URN+"topology:"+os.environ.get(
-                            "OXPO_URL")
-                    open_shelve['name'] = os.environ.get("OXPO_NAME")
-                    open_shelve['url'] = os.environ.get("OXPO_URL")
+                    open_shelve['id'] = URN+"topology:"+self.oxpo_url
+                    open_shelve['name'] = self.oxpo_name
+                    open_shelve['url'] = self.oxpo_url
                     open_shelve['version'] = 0
                     open_shelve['model_version'] = os.environ.get(
                             "MODEL_VERSION")
