@@ -214,11 +214,8 @@ class Main(KytosNApp):  # pylint: disable=R0904
                 shelve_events.append({"name": event.name, "dpid": dpid})
                 log_events['events'] = shelve_events
                 log_events.close()
-            result = self.post_sdx_topology(event_type, event.timestamp)
-            log.info(f"{HSH}{HSH}{HSH}")
-            log.info(f"{HSH} listn_event {result}{HSH}")
-            log.info(f"{HSH}{HSH}{HSH}")
-            return {"result": result["result"], "status_code": result["status_code"]}
+            sdx_lc_response = self.post_sdx_topology(event_type, event.timestamp)
+            return sdx_lc_response
         return {"event": "not action event"}
 
     def load_shelve(self):  # pylint: disable=W0613
@@ -260,25 +257,28 @@ class Main(KytosNApp):  # pylint: disable=R0904
         content = {"dpid": ""}
         event = KytosEvent(name=name, content=content)
         self.version_control = True  # pylint: disable=W0201
+        event_type = "administrative"
         # self.controller.buffers.app.put(event)
-        result = self.listen_event(event)
-        log.info(f"{HSH}{HSH}{HSH}")
-        log.info(f"{HSH} version control {result}{HSH}")
-        log.info(f"{HSH}{HSH}{HSH}")
-        #if result:
-            #if result["status_code"] == 200:
-                # open the topology shelve
-                #with shelve.open("topology_shelve") as open_shelve:
-                    #open_shelve['version'] = 1
-                    #self.version_control = True  # pylint: disable=W0201
-                    #open_shelve['version'] = self.sdx_topology["version"]
-                    #open_shelve['timestamp'] = self.sdx_topology["timestamp"]
-                    #open_shelve['nodes'] = self.sdx_topology["nodes"]
-                    #open_shelve['links'] = self.sdx_topology["links"]
-                    # now, we simply close the shelf file.
-                    # open_shelve.close()
-                    #dict_shelve = dict(open_shelve)
-                #open_shelve.close()
+        sdx_lc_response = self.post_sdx_topology(event_type, event.timestamp)
+        if sdx_lc_response["status_code"]:
+            if sdx_lc_response["status_code"] == 200:
+                if sdx_lc_response["result"]:
+                    result = sdx_lc_response["result"]
+                    # open the topology shelve
+                    with shelve.open("topology_shelve") as open_shelve:
+                        open_shelve['version'] = 1
+                        self.version_control = True  # pylint: disable=W0201
+                        open_shelve['timestamp'] = result["timestamp"]
+                        open_shelve['nodes'] = result["nodes"]
+                        open_shelve['links'] = result["links"]
+                        # now, we simply close the shelf file.
+                        dict_shelve = dict(open_shelve)
+                        open_shelve.close()
+                    with shelve.open("events_shelve") as log_events:
+                        shelve_events = log_events['events']
+                        shelve_events.append({"name": event.name, "dpid": ""})
+                        log_events['events'] = shelve_events
+                        log_events.close()
         return JSONResponse(dict_shelve)
 
     # rest api tests
