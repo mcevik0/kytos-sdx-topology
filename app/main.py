@@ -43,6 +43,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
         oxpo_names_str = os.environ.get("OXPO_NAMES")
         self.oxpo_name = oxpo_names_str.split(",")[OXPO_ID]
         oxpo_urls_str = os.environ.get("OXPO_URLS")
+        self.oxpo_urls_list = oxpo_urls_str.split(",")
         self.oxpo_url = oxpo_urls_str.split(",")[OXPO_ID]
 
     def execute(self):
@@ -134,6 +135,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     model_version=self.dict_shelve['model_version'],
                     oxp_name=self.dict_shelve['name'],
                     oxp_url=self.dict_shelve['url'],
+                    oxp_urls_list = self.oxpo_urls_list,
                 ).parse_convert_topology()
                 return {"result": topology_converted, "status_code": 200}
             return {"result": topology_mock.topology_mock(),

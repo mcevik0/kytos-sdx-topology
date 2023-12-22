@@ -16,6 +16,7 @@ class ParseConvertTopology:
         self.model_version = args['model_version']
         self.oxp_name = args['oxp_name']
         self.oxp_url = args['oxp_url']
+        self.oxp_urls_list = args['oxp_urls_list']
 
     def get_kytos_nodes(self) -> dict:
         """ return parse_args["topology"]["switches"] values """
@@ -127,15 +128,32 @@ class ParseConvertTopology:
         sdx_port["type"] = self.get_type_port_speed(str(interface["speed"]))
         sdx_port["status"] = self.get_status(interface["active"])
         sdx_port["state"] = self.get_state(interface["enabled"])
-        sdx_port["services"] = "l2vpn"
-        sdx_port["nni"] = "False"
-        if "nni" in interface["metadata"]:
-            sdx_port["nni"] = interface["metadata"]["nni"]
 
         if "mtu" in interface["metadata"]:
             sdx_port["mtu"] = interface["metadata"]["mtu"]
         else:
             sdx_port["mtu"] = 1500
+
+
+        # sdx_port["metadata"] = interface["metadata"]
+        if "sdx_nni" in interface["metadata"]:
+            if "/" in interface["metadata"]["sdx_nni"] and \
+                    ":" in interface["metadata"]["sdx_nni"]:
+                sdx_nni_url = interface["metadata"]["sdx_nni"].split("/")[0]
+                if sdx_nni_url in self.oxp_urls_list:
+                    sdx_port["nni"] = interface["metadata"]
+                else:
+                    sdx_port["nni"] = {"sdx_nni": "url name error"}
+            else:
+                sdx_port["nni"] = {"sdx_nni": "/ separator error"}
+
+        vlan_range = []
+        vlan_tuple = (0,0)
+        vlan_range.append(vlan_tuple)
+        sdx_port["services"] = {
+                "l2vpn-ptp": {"vlan_range": vlan_range},
+                "l2vpn-ptmp":{"vlan_range": vlan_range}
+                }
 
         return sdx_port
 
@@ -231,6 +249,19 @@ class ParseConvertTopology:
         node_swb = self.get_kytos_nodes_names()[switch_b]
         sdx_link["name"] = f"{node_swa}/{interface_a}_{node_swb}/{interface_b}"
         sdx_link["id"] = f"urn:sdx:link:{self.oxp_url}:%s" % sdx_link["name"]
+
+
+        vlan_range = []
+        vlan_tuple = (0,0)
+        vlan_range.append(vlan_tuple)
+        services = {
+                "l2vpn-ptp": {"vlan_range": vlan_range},
+                "l2vpn-ptmp":{"vlan_range": vlan_range}
+                }
+
+        nni = {"sdx_nni": ""}
+
+
         sdx_link["ports"] = [
                 {
                     "id": self.get_sdx_port_urn(switch_a, interface_a),
@@ -239,8 +270,8 @@ class ParseConvertTopology:
                     "type": "Other",
                     "status": "up",
                     "state": "disabled",
-                    "services": "",
-                    "nni": "False",
+                    "services": services,
+                    "nni": nni,
                     "mtu": 0
                 },
                 {
@@ -250,8 +281,8 @@ class ParseConvertTopology:
                     "type": "Other",
                     "status": "up",
                     "state": "disabled",
-                    "services": "",
-                    "nni": "False",
+                    "services": services,
+                    "nni": nni,
                     "mtu": 0
                 },
         ]
@@ -365,4 +396,5 @@ class ParseConvertTopology:
         topology["nodes"] = self.get_sdx_nodes()
         topology["links"] = self.get_sdx_links()
         topology["links"] += self.create_inter_oxp_link_entries()
+        topology["services"] = ["l2vpn-ptp"]
         return topology
