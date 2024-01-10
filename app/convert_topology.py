@@ -148,7 +148,7 @@ class ParseConvertTopology:
                 sdx_port["nni"] = {"sdx_nni": "/ separator error"}
 
         vlan_range = []
-        vlan_tuple = (0,0)
+        vlan_tuple = (1,100)
         vlan_range.append(vlan_tuple)
         sdx_port["services"] = {
                 "l2vpn-ptp": {"vlan_range": vlan_range},
@@ -252,7 +252,7 @@ class ParseConvertTopology:
 
 
         vlan_range = []
-        vlan_tuple = (0,0)
+        vlan_tuple = (1,100)
         vlan_range.append(vlan_tuple)
         services = {
                 "l2vpn-ptp": {"vlan_range": vlan_range},
