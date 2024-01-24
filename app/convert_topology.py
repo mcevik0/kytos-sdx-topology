@@ -137,15 +137,16 @@ class ParseConvertTopology:
 
         # sdx_port["metadata"] = interface["metadata"]
         if "sdx_nni" in interface["metadata"]:
-            if "/" in interface["metadata"]["sdx_nni"] and \
-                    ":" in interface["metadata"]["sdx_nni"]:
-                sdx_nni_url = interface["metadata"]["sdx_nni"].split("/")[0]
-                if sdx_nni_url in self.oxp_urls_list:
-                    sdx_port["nni"] = interface["metadata"]
-                else:
-                    sdx_port["nni"] = {"sdx_nni": "url name error"}
-            else:
-                sdx_port["nni"] = {"sdx_nni": "/ separator error"}
+            # if "/" in interface["metadata"]["sdx_nni"] and \
+            #        ":" in interface["metadata"]["sdx_nni"]:
+            #    sdx_nni_url = interface["metadata"]["sdx_nni"].split("/")[0]
+            #    if sdx_nni_url in self.oxp_urls_list:
+            #        sdx_port["nni"] = interface["metadata"]["sdx_nni"]
+            #    else:
+            #        sdx_port["nni"] = "sdx_nni: url name error"
+            #else:
+                # sdx_port["nni"] = "sdx_nni: / separator error"
+            sdx_port["nni"] = "urn:sdx:link:" + interface["metadata"]["sdx_nni"]
 
         vlan_range = []
         vlan_tuple = (1,100)
@@ -252,15 +253,12 @@ class ParseConvertTopology:
 
 
         vlan_range = []
-        vlan_tuple = (1,100)
+        vlan_tuple = (1,4096)
         vlan_range.append(vlan_tuple)
         services = {
                 "l2vpn-ptp": {"vlan_range": vlan_range},
                 "l2vpn-ptmp":{"vlan_range": vlan_range}
                 }
-
-        nni = {"sdx_nni": ""}
-
 
         sdx_link["ports"] = [
                 {
@@ -271,7 +269,7 @@ class ParseConvertTopology:
                     "status": "up",
                     "state": "disabled",
                     "services": services,
-                    "nni": nni,
+                    "nni": "sdx_nni:",
                     "mtu": 0
                 },
                 {
@@ -282,7 +280,7 @@ class ParseConvertTopology:
                     "status": "up",
                     "state": "disabled",
                     "services": services,
-                    "nni": nni,
+                    "nni": "sdx_nni:",
                     "mtu": 0
                 },
         ]

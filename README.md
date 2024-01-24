@@ -16,9 +16,45 @@ Requirements
 Preparing the environment:
 ==========================
 
+Please make sure you're using Debian
+
+lsb_release -a
+
+
 ``Installing Python``
 
 Please make sure that you're using python3.9
+
+sudo rm -rf /var/lib/apt/lists/*; sudo apt-get purge -y --auto-remove; sudo apt-get autoremove; sudo apt-get clean;
+sudo rm -rf /etc/apt/sources.list.d/*
+
+sudo apt update && sudo apt upgrade
+sudo apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libsqlite3-dev libreadline-dev libffi-dev curl libbz2-dev -y
+wget https://www.python.org/ftp/python/3.9.17/Python-3.9.17.tar.xz
+sudo mv Python-3.9.17 /usr/local/share/python3.9
+cd /usr/local/share/python3.9
+./configure --enable-optimizations --enable-shared
+make
+make -j 5
+sudo make altinstall
+sudo ldconfig /usr/local/share/python3.9
+sudo ln -s /usr/local/bin/python3.9 python3.9
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 2
+pip3.9 install --upgrade pip
+pip3 install pytest==7.2.1
+pip3 install pytest-cov==4.0.0
+pip3 install black==23.3.0
+pip3 install isort==5.12.0
+pip3 install pylint==2.15.0
+pip3 install pycodestyle==2.10.0
+pip3 install yala==3.2.0
+pip3 install tox==3.28.0
+pip3 install typing-extensions==4.7.1
+mkdir ~/.vim/bundle
+cd ~/.vim/bundle
+git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+git clone https://github.com/dense-analysis/ale.git
 
 
 Installation 
