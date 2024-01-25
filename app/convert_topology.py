@@ -137,15 +137,6 @@ class ParseConvertTopology:
 
         # sdx_port["metadata"] = interface["metadata"]
         if "sdx_nni" in interface["metadata"]:
-            # if "/" in interface["metadata"]["sdx_nni"] and \
-            #        ":" in interface["metadata"]["sdx_nni"]:
-            #    sdx_nni_url = interface["metadata"]["sdx_nni"].split("/")[0]
-            #    if sdx_nni_url in self.oxp_urls_list:
-            #        sdx_port["nni"] = interface["metadata"]["sdx_nni"]
-            #    else:
-            #        sdx_port["nni"] = "sdx_nni: url name error"
-            #else:
-                # sdx_port["nni"] = "sdx_nni: / separator error"
             sdx_port["nni"] = "urn:sdx:link:" + interface["metadata"]["sdx_nni"]
 
         vlan_range = []
