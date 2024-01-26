@@ -114,7 +114,6 @@ class Main(KytosNApp):  # pylint: disable=R0904
         the version control that will be updated every time a change is
         detected in kytos topology, and return a new sdx topology"""
         try:
-            # open the topology shelve
             with shelve.open("topology_shelve") as open_shelve:
                 version = open_shelve['version']
                 self.dict_shelve = dict(open_shelve)  # pylint: disable=W0201
@@ -168,7 +167,6 @@ class Main(KytosNApp):  # pylint: disable=R0904
             if evaluate_topology["status_code"] == 200:
                 result = self.post_sdx_lc(event_type)
                 return result
-            # open the event shelve
             with shelve.open("events_shelve") as log_events:
                 shelve_events = log_events['events']
                 shelve_events.append(
@@ -225,12 +223,10 @@ class Main(KytosNApp):  # pylint: disable=R0904
         has been loaded before all the other functions that use it begins to
         call it."""
         if not self.shelve_loaded:  # pylint: disable=E0203
-            # open the sdx topology shelve file
             with shelve.open("topology_shelve") as open_shelve:
                 if 'id' not in open_shelve.keys() or \
                         'name' not in open_shelve.keys() or \
                         'version' not in open_shelve.keys():
-                    # initialize sdx topology
                     open_shelve['id'] = URN+"topology:"+self.oxpo_url
                     open_shelve['name'] = self.oxpo_name
                     open_shelve['url'] = self.oxpo_url
@@ -242,9 +238,7 @@ class Main(KytosNApp):  # pylint: disable=R0904
                     open_shelve['links'] = []
                 self.dict_shelve = dict(open_shelve)  # pylint: disable=W0201
                 self.shelve_loaded = True  # pylint: disable=W0201
-                # now, we simply close the shelf file.
                 open_shelve.close()
-            # open the events shelve file
             with shelve.open("events_shelve") as events_shelve:
                 events_shelve['events'] = []
                 events_shelve.close()
@@ -253,27 +247,23 @@ class Main(KytosNApp):  # pylint: disable=R0904
     def get_version_control(self, _request: Request) -> JSONResponse:
         """return true if kytos topology is ready"""
         dict_shelve = {}
-        # Initialize the shelf
         self.load_shelve()
         name = "version/control.initialize"
         content = {"dpid": ""}
         event = KytosEvent(name=name, content=content)
         self.version_control = True  # pylint: disable=W0201
         event_type = "administrative"
-        # self.controller.buffers.app.put(event)
         sdx_lc_response = self.post_sdx_topology(event_type, event.timestamp)
         if sdx_lc_response["status_code"]:
             if sdx_lc_response["status_code"] == 200:
                 if sdx_lc_response["result"]:
                     result = sdx_lc_response["result"]
-                    # open the topology shelve
                     with shelve.open("topology_shelve") as open_shelve:
                         open_shelve['version'] = 1
                         self.version_control = True  # pylint: disable=W0201
                         open_shelve['timestamp'] = result["timestamp"]
                         open_shelve['nodes'] = result["nodes"]
                         open_shelve['links'] = result["links"]
-                        # now, we simply close the shelf file.
                         dict_shelve = dict(open_shelve)
                         open_shelve.close()
                     with shelve.open("events_shelve") as log_events:

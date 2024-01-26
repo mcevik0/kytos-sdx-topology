@@ -23,7 +23,7 @@ lsb_release -a
 
 ``Installing Python``
 
-Please make sure that you're using python3.9
+``Please make sure that you're using python3.9``
 
 sudo rm -rf /var/lib/apt/lists/*; sudo apt-get purge -y --auto-remove; sudo apt-get autoremove; sudo apt-get clean;
 sudo rm -rf /etc/apt/sources.list.d/*

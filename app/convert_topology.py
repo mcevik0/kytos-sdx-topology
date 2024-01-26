@@ -134,8 +134,6 @@ class ParseConvertTopology:
         else:
             sdx_port["mtu"] = 1500
 
-
-        # sdx_port["metadata"] = interface["metadata"]
         if "sdx_nni" in interface["metadata"]:
             sdx_port["nni"] = "urn:sdx:link:" + interface["metadata"]["sdx_nni"]
 
