@@ -208,7 +208,7 @@ setup(
     author="Kytos Team",
     author_email="of-ng-dev@ncc.unesp.br",
     license="MIT",
-    install_requires=["setuptools >= 36.0.1"],
+    install_requires=["setuptools == 58.2.0"],
     extras_require={
         "dev": [
             "coverage",
